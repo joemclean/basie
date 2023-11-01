@@ -2,7 +2,7 @@
 TARGET = Basie
 
 # Sources
-CPP_SOURCES = src/Basie.cpp
+CPP_SOURCES = Basie.cpp
 
 # Library Locations
 LIBDAISY_DIR = ../../libDaisy
