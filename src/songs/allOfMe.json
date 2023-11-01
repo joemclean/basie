@@ -1,0 +1,25 @@
+{
+  "name": "All of Me",
+  "chords":
+  [
+    "C maj7","C maj7","C maj7","C maj7", "C maj7","C maj7","C maj7","C maj7",
+    "E 7","E 7","E 7","E 7", "E 7","E 7","E 7","E 7",
+    "A 7","A 7","A 7","A 7", "A 7","A 7","A 7","A 7",
+    "D min7","D min7","D min7","D min7", "D min7","D min7","D min7","D min7",
+
+    "E 7","E 7","E 7","E 7", "E 7","E 7","E 7","E 7",
+    "A min7","A min7","A min7","A min7", "A min7","A min7","A min7","A min7",
+    "D 7","D 7","D 7","D 7", "D 7","D 7","D 7","D 7",
+    "D min7","D min7","D min7","D min7", "G 7","G 7","G 7","G 7",
+
+    "C maj7","C maj7","C maj7","C maj7", "C maj7","C maj7","C maj7","C maj7",
+    "E 7","E 7","E 7","E 7", "E 7","E 7","E 7","E 7",
+    "A 7","A 7","A 7","A 7", "A 7","A 7","A 7","A 7",
+    "D min7","D min7","D min7","D min7", "D min7","D min7","D min7","D min7",
+
+    "F maj7","F maj7","F maj7","F maj7", "F min6","F min6","F min6","F min6",
+    "E min7","E min7","E min7","E min7", "A 7","A 7","A 7","A 7",
+    "D maj6","D maj6","D maj6","D maj6", "G 7","G 7","G 7","G 7",
+    "C ,maj6","C ,maj6","Eb dim7","Eb dim7", "D min7","D min7","G 7","G 7"
+  ]
+}

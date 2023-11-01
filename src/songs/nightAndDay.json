@@ -1,0 +1,35 @@
+{
+  "name": "Night and Day",
+  "chords":
+  [
+    "Ab halfdim7", "Ab maj7", "Ab maj7", "Ab maj7", "G 7", "G 7", "G 7", "G 7",
+    "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7","C maj7",
+    "Ab maj7","Ab maj7","Ab maj7","Ab maj7", "G 7", "G 7", "G 7", "G 7",
+    "C maj7","C maj7","C maj7","C maj7", "C maj7","C maj7","C maj7","C maj7",
+
+    "Gb halfdim7", "Gb halfdim7", "Gb halfdim7", "Gb halfdim7", "F min7", "F min7", "F min7", "F min7",
+    "E min7", "E min7", "E min7", "E min7", "Eb dim7", "Eb dim7", "Eb dim7", "Eb dim7",
+    "D min7", "D min7", "D min7", "D min7", "G 7", "G 7", "G 7", "G 7", 
+    "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7",
+
+    "Ab maj7", "Ab maj7", "Ab maj7", "Ab maj7", "G 7", "G 7", "G 7", "G 7",
+    "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7",
+    "Ab maj7", "Ab maj7", "Ab maj7", "Ab maj7", "G 7", "G 7", "G 7", "G 7",
+    "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7",
+
+    "Gb halfdim7", "Gb halfdim7", "Gb halfdim7", "Gb halfdim7", "F min7", "F min7", "F min7", "F min7",
+    "E min7", "E min7", "E min7", "E min7", "Eb dim7", "Eb dim7", "Eb dim7", "Eb dim7",
+    "D min7", "D min7", "D min7", "D min7", "G 7", "G 7", "G 7", "G 7",
+    "C maj7", "C maj7", "C maj7", "C maj7", "Bb 7", "Bb 7", "Bb 7", "Bb 7",
+
+    "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7",
+    "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7",
+    "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7", "Eb maj7",
+    "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7",
+
+    "Gb halfdim7", "Gb halfdim7", "Gb halfdim7", "Gb halfdim7", "F min7", "F min7", "F min7", "F min7",
+    "E min7", "E min7", "E min7", "E min7", "Eb dim7", "Eb dim7", "Eb dim7", "Eb dim7",
+    "D min7", "D min7", "D min7", "D min7", "G 7", "G 7", "G 7", "G 7",
+    "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7", "C maj7"
+  ]
+}

@@ -2,6 +2,8 @@
 #include "daisy_patch.h"
 #include <string>
 
+#include "nlohmann/json.hpp"
+
 using namespace daisy;
 using namespace daisysp;
 
