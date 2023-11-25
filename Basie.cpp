@@ -351,11 +351,11 @@ void Process()
     targetScale = targetChord->chordScale;
 
     // Migration TODO: Actually read Jazz param
-    float jazzKnob =  0.0;
+    float jazzKnob =  0.5;
     // float jazzKnob =  params[JAZZ_PARAM].getValue();
-    float jazzCV = 0.0;
+    float jazzCV = 0.5;
     // float jazzCV = params[JAZZ_AMT_IN].getValue();
-    float jazzCVAttenuation = 0.0;
+    float jazzCVAttenuation = 0.5;
     // float jazzCVAttenuation = params[JAZZ_CV_ATTENUATOR].getValue();
     float jazzAmount = jazzKnob + ((jazzCV / 10.0) * jazzCVAttenuation);
 
@@ -363,17 +363,19 @@ void Process()
     if (jazzAmount < 0) jazzAmount = 0;
 
     // Migration TODO: Actually read quantizer ins
-    float voice1Voltage = 0.0;
+    // float voice1Voltage = 0.0;
     float voice2Voltage = 0.0;
-    // float voice1Voltage = inputs[QUANT_IN].getVoltage();
+
+
+    float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 5.f;
     // float voice2Voltage = inputs[QUANT_2_IN].getVoltage();
 
-    std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
+    std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, 0.5);
     std::pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
 
-    // float note1QuantizedVoltage = values1.first;
+    float note1QuantizedVoltage = values1.first;
     // float note2QuantizedVoltage = values2.first;
-    // int index1 = values1.second;
+    int index1 = values1.second;
     // int index2 = values2.second;
 
     int targetScaleSize = targetScale.size();
@@ -399,9 +401,9 @@ void Process()
 
 
     patch.seed.dac.WriteValue(DacHandle::Channel::ONE,
-                              chordVoltages[0] * 819.2f);
+                              note1QuantizedVoltage * 819.2f);
     patch.seed.dac.WriteValue(DacHandle::Channel::TWO,
-                              chordVoltages[1] * 819.2f);
+                              chordVoltages[0] * 819.2f);
 
 }
 
