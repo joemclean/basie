@@ -3,6 +3,13 @@
 #include <string>
 #include <array>
 
+#include "nlohmann/json.hpp"
+#include "fatfs.h"
+
+// for convenience
+
+using nlohmann::json;
+
 using std::array;
 using std::string;
 
@@ -367,7 +374,7 @@ void Process()
     float voice2Voltage = 0.0;
 
 
-    float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 5.f;
+    float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 1.f;
     // float voice2Voltage = inputs[QUANT_2_IN].getVoltage();
 
     std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, 0.5);
