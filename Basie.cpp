@@ -44,14 +44,8 @@ int chordType = 0;
 
 // ----------------- //
 
-void updateDisplay(std::string stringToWrite)
-{
-
-}
-
 std::string loadChordsFromFile(void)
 {
-    // Vars and buffs.
     displayText = "Starting load";
     std::string chordData;
 
@@ -77,14 +71,12 @@ std::string loadChordsFromFile(void)
             buffer[br] = '\0';
             
             // Now 'buffer' contains the entire file content as a C-style string
-            // If you need a C++ std::string
             std::string fileContent(buffer);
             displayText = fileContent;
             chordData = fileContent;
 
         } else {
             displayText = "Read error: " + std::to_string(fr);
-            //hw.PrintLine("Read error: %d\n", fr);
         }
         // Close the file
         f_close(&file);
@@ -198,7 +190,7 @@ std::string trim(const std::string& str) {
     return str.substr(first, (last - first + 1));
 }
 
-// Function to parse chords without using stringstream
+// Parse chords string into a vector that can be iterated over
 std::vector<std::string> parseChords(const std::string& chordString) {
     std::vector<std::string> chords;
     std::string chord;
@@ -255,7 +247,7 @@ void UpdateControls()
 }
 
 void Process()
-{
+{                                                                                                                   
     // Advance the playhead on clock trigger
     Chord *targetChord;
     
@@ -272,7 +264,6 @@ void Process()
     }
 
     // TODO - only do all of this if the playhead advances
-
     std::string chord = currentSongChords[playhead];
 
     string chordRoot = "C";
@@ -311,7 +302,6 @@ void Process()
     }
 
     // Iterate over chord tones to get an array of voltages
-
     float chordRootOffsetVoltage = (float)chordRootIndex / 12.0;
     int chordToneCount = targetChord->tones.size();
 
@@ -328,9 +318,6 @@ void Process()
         int chordTone = targetChord->tones[i];
         // TODO Abstract this
         // Migration TODO: Reimplement voicing type
-        // if (params[VOICING_TYPE_PARAM].getValue() == 1.0) {
-        //     chordTone = chordTone % 12;
-        // }
         // Migration TODO: UI
         // int targetLightIndex = (chordRootIndex + chordTone) % 12;
         // setRGBBrightness(chordLights[targetLightIndex], 0.1, 0.1, 0.05);
@@ -350,9 +337,8 @@ void Process()
     }
 
     // Write the chord tones to output
-
     // Migration TODO: Write output values
-    
+
     // outputs[CV_OUTPUT_1].setVoltage(chordVoltages[0]);
     // outputs[CV_OUTPUT_2].setVoltage(chordVoltages[1]);
     // outputs[CV_OUTPUT_3].setVoltage(chordVoltages[2]);
@@ -365,8 +351,6 @@ void Process()
     chordDisplay = noteDisplayNames[chordRootIndex] + targetChord->displayName;
 
     // Migration TODO: Update display
-
-    //updateDisplay(chordDisplay);
 
     // Quantize input to output
     targetScale = targetChord->chordScale;
@@ -383,13 +367,9 @@ void Process()
     if (jazzAmount > 1) jazzAmount = 1;
     if (jazzAmount < 0) jazzAmount = 0;
 
-    // Migration TODO: Actually read quantizer ins
-    // float voice1Voltage = 0.0;
-    float voice2Voltage = 0.0;
-
-
+    // Read quantizer ins
     float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 1.f;
-    // float voice2Voltage = inputs[QUANT_2_IN].getVoltage();
+    float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 1.f;
 
     std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, 0.5); //jazzAmt used to be last arg
     std::pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, 0.5); //jazzAmt used to be last arg
@@ -414,11 +394,6 @@ void Process()
     // setRGBBrightness(quantizerLights[(index1 + chordRootIndex) % 12], 0.0, 0.0, 1.0);
     // setRGBBrightness(quantizer2Lights[(index2 + chordRootIndex) % 12], 0.0, 1.0, 0);
 
-    // Migration TODO: Set quantizer outputs
-    // outputs[QUANT_OUT].setVoltage(note1QuantizedVoltage);
-    // outputs[QUANT_2_OUT].setVoltage(note2QuantizedVoltage);
-
-
     patch.seed.dac.WriteValue(DacHandle::Channel::ONE,
                               note1QuantizedVoltage * 819.2f);
     patch.seed.dac.WriteValue(DacHandle::Channel::TWO,
@@ -442,14 +417,6 @@ void UpdateOled()
 
 void UpdateOutputs()
 {
-
-    // patch.seed.dac.WriteValue(DacHandle::Channel::ONE,
-    //                           round((values[stepNumber] / 12.f) * 819.2f));
-    // patch.seed.dac.WriteValue(DacHandle::Channel::TWO,
-    //                           round((values[stepNumber] / 12.f) * 819.2f));
-
-    // dsy_gpio_write(&patch.gate_output, trigOut);
-    // trigOut = false;
 }
 
 
