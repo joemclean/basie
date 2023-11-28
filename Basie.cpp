@@ -47,13 +47,12 @@ void updateDisplay(std::string stringToWrite)
 
 }
 
-std::vector<std::string> loadChordsFromFile(void)
+std::string loadChordsFromFile(void)
 {
     // Vars and buffs.
     displayText = "Starting load";
+    std::string chordData;
 
-    std::vector<std::string> fileChords;
-    
     // Init SD Card
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
@@ -79,6 +78,7 @@ std::vector<std::string> loadChordsFromFile(void)
             // If you need a C++ std::string
             std::string fileContent(buffer);
             displayText = fileContent;
+            chordData = fileContent;
 
         } else {
             displayText = "Read error: " + std::to_string(fr);
@@ -90,7 +90,7 @@ std::vector<std::string> loadChordsFromFile(void)
         displayText = "File open error";
     }
 
-    return fileChords;
+    return chordData;
 }
 
 void UpdateControls();
@@ -234,36 +234,11 @@ std::vector<std::string> parseChords(const std::string& chordString) {
     return chords;
 }
 
-
-
 int main(void)
 {
     patch.Init(); // Initialize hardware (daisy seed, and patch)
 
-    string autumnLeavesChords;
-    autumnLeavesChords = R"(
-        C min7 | C min7 | C min7 | C min7 | F 7 | F 7 | F 7 | F 7 |
-        Bb maj7 | Bb maj7 | Bb maj7 | Bb maj7 | Eb maj7 | Eb maj7 | Eb maj7 | Eb maj7 |
-        A dim7 | A dim7 | A dim7 | A dim7 | D 7 | D 7 | D 7 | D 7 |
-        G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6 |
-
-        C min7 | C min7 | C min7 | C min7 | F 7 | F 7 | F 7 | F 7 |
-        Bb maj7 | Bb maj7 | Bb maj7 | Bb maj7 | Eb maj7 | Eb maj7 | Eb maj7 | Eb maj7 |
-        A dim7 | A dim7 | A dim7 | A dim7 | D 7 | D 7 | D 7 | D 7 |
-        G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6 |
-
-        A dim7 | A dim7 | A dim7 | A dim7 | D 7 | D 7 | D 7 | D 7 |
-        G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6 |
-        C min7 | C min7 | C min7 | C min7 | F 7 | F 7 | F 7 | F 7 |
-        Bb maj7 | Bb maj7 | Bb maj7 | Bb maj7 | Eb maj7 | Eb maj7 | Eb maj7 | Eb maj7 |
-        
-        A dim7 | A dim7 | A dim7 | A dim7 | D 7 | D 7 | D 7 | D 7 |
-        Gmin 7 | Gmin 7 | Gb 7 | Gb 7 | F min7 | F min7 | E 7 | E 7 |
-        A dim7 | A dim7 | A dim7 | A dim7 | D 7 | D 7 | D 7 | D 7 |
-        G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6
-    )";
-
-    loadChordsFromFile();
+    string autumnLeavesChords = loadChordsFromFile();
 
     Song *song = new Song;
     song->name = "Autumn Leaves";
@@ -283,7 +258,7 @@ int main(void)
         UpdateOutputs();
     }
 
-    for (int i = 0; i < chordList.size(); i++) {
+    for (std::size_t i = 0; i < chordList.size(); i++) {
         delete chordList[i];
     }
 }
@@ -344,7 +319,7 @@ void Process()
     }
 
     targetChord = majorChord;
-    for (int i = 0; i < chordList.size(); i++) {
+    for (std::size_t i = 0; i < chordList.size(); i++) {
         if (chordList[i]->displayName == chordType) {
             targetChord = chordList[i];
         }
@@ -431,13 +406,11 @@ void Process()
     float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 1.f;
     // float voice2Voltage = inputs[QUANT_2_IN].getVoltage();
 
-    std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, 0.5);
-    std::pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
+    std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, 0.5); //jazzAmt used to be last arg
+    std::pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, 0.5); //jazzAmt used to be last arg
 
     float note1QuantizedVoltage = values1.first;
-    // float note2QuantizedVoltage = values2.first;
-    int index1 = values1.second;
-    // int index2 = values2.second;
+    float note2QuantizedVoltage = values2.first;
 
     int targetScaleSize = targetScale.size();
     for (int i = 0; i < targetScaleSize; i++) {
@@ -464,7 +437,7 @@ void Process()
     patch.seed.dac.WriteValue(DacHandle::Channel::ONE,
                               note1QuantizedVoltage * 819.2f);
     patch.seed.dac.WriteValue(DacHandle::Channel::TWO,
-                              chordVoltages[0] * 819.2f);
+                              note2QuantizedVoltage * 819.2f);
 
 }
 
