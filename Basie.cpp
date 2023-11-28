@@ -18,7 +18,15 @@ using namespace daisysp;
 
 DaisyPatch patch;
 
+#define TEST_FILE_NAME "autumnLeaves.json"
+
 // ---------My variables-------- //
+
+static DaisySeed hw;
+
+SdmmcHandler   sd;
+FatFSInterface fsi;
+FIL            SDFile;
 
 int selectedSongIndex = 0;
 string chordDisplay = "";
@@ -29,6 +37,53 @@ int playhead = 0;
 int chordType = 0;
 
 // ----------------- //
+
+
+std::vector<std::string> loadChordsFromFile(void)
+{
+    // Vars and buffs.
+
+    std::vector<std::string> fileChords;
+    char   outbuff[512];
+    char   inbuff[512];
+    size_t len, byteswritten;
+    sprintf(outbuff, "Daisy...Testing...\n1...\n2...\n3...\n");
+    memset(inbuff, 0, 512);
+    len     = strlen(outbuff);
+
+    // Init hardware
+    hw.Init();
+
+    // Init SD Card
+    SdmmcHandler::Config sd_cfg;
+    sd_cfg.Defaults();
+    sd.Init(sd_cfg);
+
+    // Links libdaisy i/o to fatfs driver.
+    fsi.Init(FatFSInterface::Config::MEDIA_SD);
+
+    // Mount SD Card
+    f_mount(&fsi.GetSDFileSystem(), "/", 1);
+
+    // Read back the test file from the SD Card.
+    if(f_open(&SDFile, TEST_FILE_NAME, FA_READ) == FR_OK)
+    {
+        f_read(&SDFile, inbuff, len, &byteswritten);
+        f_close(&SDFile);
+    }
+
+    bool ledstate;
+    ledstate = true;
+    // The onboard LED will begin to blink.
+    for(;;)
+    {
+        System::Delay(250);
+        hw.SetLed(ledstate);
+        ledstate = !ledstate;
+    }
+
+    return fileChords;
+}
 
 void UpdateControls();
 void UpdateOled();
@@ -199,6 +254,8 @@ int main(void)
         A dim7 | A dim7 | A dim7 | A dim7 | D 7 | D 7 | D 7 | D 7 |
         G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6 | G min6
     )";
+
+    loadChordsFromFile();
 
     Song *song = new Song;
     song->name = "Autumn Leaves";
