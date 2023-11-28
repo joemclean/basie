@@ -3,12 +3,9 @@
 #include <string>
 #include <array>
 
-#include "nlohmann/json.hpp"
 #include "fatfs.h"
 
 // for convenience
-
-using nlohmann::json;
 
 using std::array;
 using std::string;
@@ -18,42 +15,45 @@ using namespace daisysp;
 
 DaisyPatch patch;
 
-#define TEST_FILE_NAME "autumnLeaves.json"
-
 // ---------My variables-------- //
 
 static DaisySeed hw;
 
 SdmmcHandler   sd;
 FatFSInterface fsi;
-FIL            SDFile;
+
+FIL file;       // File object
+FRESULT fr;     // FatFs return code
+UINT br;        // Read count
+
+constexpr size_t bufferSize = 4096; // Example size, adjust as needed
+char buffer[bufferSize] = {0};
 
 int selectedSongIndex = 0;
 string chordDisplay = "";
 string songName = "-";
 
+string displayText = "";
+
 int playhead = 0;
 
 int chordType = 0;
 
+
 // ----------------- //
 
+void updateDisplay(std::string stringToWrite)
+{
+
+}
 
 std::vector<std::string> loadChordsFromFile(void)
 {
     // Vars and buffs.
+    displayText = "Starting load";
 
     std::vector<std::string> fileChords;
-    char   outbuff[512];
-    char   inbuff[512];
-    size_t len, byteswritten;
-    sprintf(outbuff, "Daisy...Testing...\n1...\n2...\n3...\n");
-    memset(inbuff, 0, 512);
-    len     = strlen(outbuff);
-
-    // Init hardware
-    hw.Init();
-
+    
     // Init SD Card
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
@@ -65,21 +65,29 @@ std::vector<std::string> loadChordsFromFile(void)
     // Mount SD Card
     f_mount(&fsi.GetSDFileSystem(), "/", 1);
 
-    // Read back the test file from the SD Card.
-    if(f_open(&SDFile, TEST_FILE_NAME, FA_READ) == FR_OK)
-    {
-        f_read(&SDFile, inbuff, len, &byteswritten);
-        f_close(&SDFile);
-    }
+    // Try to open the file
+    fr = f_open(&file, "autumnLeaves.txt", FA_READ);
 
-    bool ledstate;
-    ledstate = true;
-    // The onboard LED will begin to blink.
-    for(;;)
-    {
-        System::Delay(250);
-        hw.SetLed(ledstate);
-        ledstate = !ledstate;
+    if (fr == FR_OK) {
+        // Read the entire file into the buffer
+        fr = f_read(&file, buffer, bufferSize - 1, &br);
+        if (fr == FR_OK) {
+            // Ensure there's a null terminator at the end of the read data
+            buffer[br] = '\0';
+            
+            // Now 'buffer' contains the entire file content as a C-style string
+            // If you need a C++ std::string
+            std::string fileContent(buffer);
+            displayText = fileContent;
+
+        } else {
+            displayText = "Read error: " + std::to_string(fr);
+            //hw.PrintLine("Read error: %d\n", fr);
+        }
+        // Close the file
+        f_close(&file);
+    } else {
+        displayText = "File open error";
     }
 
     return fileChords;
@@ -398,18 +406,7 @@ void Process()
 
     // Migration TODO: Update display
 
-
-    patch.display.Fill(false);
-
-    std::string str  = chordDisplay;
-    char*       cstr = &str[0];
-
-    // std::string str  = "Sequential Switch";
-    // char*       cstr = &str[0];
-    patch.display.SetCursor(0, 0);
-    patch.display.WriteString(cstr, Font_7x10, true);
-
-    patch.display.Update();
+    //updateDisplay(chordDisplay);
 
     // Quantize input to output
     targetScale = targetChord->chordScale;
@@ -474,6 +471,15 @@ void Process()
 
 void UpdateOled()
 {
+    patch.display.Fill(false);
+
+    std::string str  = displayText;
+    char*       cstr = &str[0];
+
+    patch.display.SetCursor(0, 0);
+    patch.display.WriteString(cstr, Font_7x10, true);
+
+    patch.display.Update();
 }
 
 void UpdateOutputs()
