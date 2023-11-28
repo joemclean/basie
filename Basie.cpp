@@ -33,6 +33,8 @@ int selectedSongIndex = 0;
 string chordDisplay = "";
 string songName = "-";
 
+std::vector<std::string> currentSongChords;
+
 string displayText = "";
 
 int playhead = 0;
@@ -159,12 +161,6 @@ struct ChordScale
     std::array<int, 12> tones;
 };
 
-struct Song
-{
-    std::vector<std::string> chords;
-    string name;
-};
-
 std::pair<float, int> quantizeToScale(const float& noteInVoltage, const float& chordRootOffsetVoltage, const array<float, 12>& targetScale, const float& jazzAmount)
 {
     float whole, fractional;
@@ -191,11 +187,6 @@ std::pair<float, int> quantizeToScale(const float& noteInVoltage, const float& c
     float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
     return std::make_pair(targetNoteVoltage, nearestScaleToneIndex);
 }
-
-std::vector<Song *> songs;
-
-
-
 
 // Helper function to trim whitespace from the start and end of a string
 std::string trim(const std::string& str) {
@@ -238,16 +229,10 @@ int main(void)
 {
     patch.Init(); // Initialize hardware (daisy seed, and patch)
 
-    string autumnLeavesChords = loadChordsFromFile();
+    string fileChords = loadChordsFromFile();
 
-    Song *song = new Song;
-    song->name = "Autumn Leaves";
+   currentSongChords = parseChords(fileChords);
 
-    std::vector<std::string> chords = parseChords(autumnLeavesChords);
-
-    song->chords = chords;
-
-    songs.push_back(song);
 
     patch.StartAdc();
     while(1)
@@ -276,7 +261,7 @@ void Process()
     
     if (patch.gate_input[0].Trig())
     {
-        int songLength = songs[selectedSongIndex]->chords.size();
+        int songLength = currentSongChords.size();
         playhead = (playhead + 1) % songLength;
     }
 
@@ -288,7 +273,7 @@ void Process()
 
     // TODO - only do all of this if the playhead advances
 
-    std::string chord = songs[selectedSongIndex]->chords[playhead];
+    std::string chord = currentSongChords[playhead];
 
     string chordRoot = "C";
     string chordType = "maj7";
