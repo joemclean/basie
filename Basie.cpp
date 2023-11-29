@@ -35,7 +35,9 @@ string songName = "-";
 
 std::vector<std::string> currentSongChords;
 
-string displayText = "";
+string displayLineOne = "";
+string displayLineTwo = "";
+string displayLineThree = "";
 
 int playhead = 0;
 
@@ -46,7 +48,7 @@ int chordType = 0;
 
 std::string loadChordsFromFile(void)
 {
-    displayText = "Starting load";
+    displayLineOne = "Starting load";
     std::string chordData;
 
     // Init SD Card
@@ -72,16 +74,16 @@ std::string loadChordsFromFile(void)
             
             // Now 'buffer' contains the entire file content as a C-style string
             std::string fileContent(buffer);
-            displayText = fileContent;
+            displayLineOne = fileContent;
             chordData = fileContent;
 
         } else {
-            displayText = "Read error: " + std::to_string(fr);
+            displayLineOne = "Read error: " + std::to_string(fr);
         }
         // Close the file
         f_close(&file);
     } else {
-        displayText = "File open error";
+        displayLineOne = "File open error";
     }
 
     return chordData;
@@ -351,6 +353,8 @@ void Process()
     chordDisplay = noteDisplayNames[chordRootIndex] + targetChord->displayName;
 
     // Migration TODO: Update display
+    displayLineTwo = "Current chord:";
+    displayLineThree = chordDisplay; 
 
     // Quantize input to output
     targetScale = targetChord->chordScale;
@@ -406,11 +410,20 @@ void UpdateOled()
 {
     patch.display.Fill(false);
 
-    std::string str  = displayText;
+    std::string str  = displayLineOne;
     char*       cstr = &str[0];
 
     patch.display.SetCursor(0, 0);
     patch.display.WriteString(cstr, Font_7x10, true);
+
+    patch.display.SetCursor(0, 10);
+    str = displayLineTwo;
+    patch.display.WriteString(cstr, Font_7x10, true);
+
+    patch.display.SetCursor(0, 20);
+    str = displayLineThree;
+    patch.display.WriteString(cstr, Font_7x10, true);
+
 
     patch.display.Update();
 }
