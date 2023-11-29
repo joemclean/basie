@@ -17,7 +17,7 @@ DaisyPatch patch;
 
 // ---------My variables-------- //
 
-static DaisySeed hw;
+static DaisyPatch hw;
 
 SdmmcHandler   sd;
 FatFSInterface fsi;
@@ -25,6 +25,9 @@ FatFSInterface fsi;
 FIL file;       // File object
 FRESULT fr;     // FatFs return code
 UINT br;        // Read count
+
+int displayTabIndex = 1;
+bool encoderIsHeld = false;
 
 constexpr size_t bufferSize = 4096; // Example size, adjust as needed
 char buffer[bufferSize] = {0};
@@ -227,7 +230,6 @@ int main(void)
 
    currentSongChords = parseChords(fileChords);
 
-
     patch.StartAdc();
     while(1)
     {
@@ -242,10 +244,32 @@ int main(void)
     }
 }
 
+void ProcessEncoder()
+{
+    if (patch.encoder.RisingEdge()) {
+        encoderIsHeld = true;
+    }
+    if (patch.encoder.FallingEdge()) {
+        encoderIsHeld = false;
+    }
+    if (patch.encoder.Increment() != 0)
+    {
+        if (encoderIsHeld) {
+            displayTabIndex++;
+            displayTabIndex = displayTabIndex % 2;
+        } else {
+            // navigate file system
+        }
+    }
+    UpdateOled();
+}
+
 void UpdateControls()
 {
     patch.ProcessAnalogControls();
     patch.ProcessDigitalControls();
+
+    ProcessEncoder();
 }
 
 void Process()
@@ -409,21 +433,29 @@ void Process()
 void UpdateOled()
 {
     patch.display.Fill(false);
+    if (displayTabIndex == 0) 
+    {
+        std::string str  = displayLineOne;
+        char*       cstr = &str[0];
 
-    std::string str  = displayLineOne;
-    char*       cstr = &str[0];
+        patch.display.SetCursor(0, 0);
+        patch.display.WriteString(cstr, Font_7x10, true);
 
-    patch.display.SetCursor(0, 0);
-    patch.display.WriteString(cstr, Font_7x10, true);
+        patch.display.SetCursor(0, 10);
+        str = displayLineTwo;
+        patch.display.WriteString(cstr, Font_7x10, true);
 
-    patch.display.SetCursor(0, 10);
-    str = displayLineTwo;
-    patch.display.WriteString(cstr, Font_7x10, true);
+        patch.display.SetCursor(0, 20);
+        str = displayLineThree;
+        patch.display.WriteString(cstr, Font_7x10, true);
+    } else if (displayTabIndex == 1)
+    {
+        std::string str = "File browser";
+        char*       cstr = &str[0];
 
-    patch.display.SetCursor(0, 20);
-    str = displayLineThree;
-    patch.display.WriteString(cstr, Font_7x10, true);
-
+        patch.display.SetCursor(0, 0);
+        patch.display.WriteString(cstr, Font_7x10, true);
+    }
 
     patch.display.Update();
 }
