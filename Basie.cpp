@@ -34,7 +34,7 @@ std::vector<std::string> fileList;
 int fileListCursor = 0;
 int loadedFileIndex = 0;
 
-int displayTabIndex = 1;
+int displayTabIndex = 0;
 bool encoderIsHeld = false;
 bool tabChangeInProcess = false;
 
@@ -453,7 +453,7 @@ void Process()
     // Migration TODO: Update display
     displayLineTwo = "Current chord:";
     displayLineThree = chordDisplay; 
-    
+
     // Quantize input to output
     targetScale = targetChord->chordScale;
 
