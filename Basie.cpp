@@ -36,6 +36,7 @@ int loadedFileIndex = 0;
 
 int displayTabIndex = 1;
 bool encoderIsHeld = false;
+bool tabChangeInProcess = false;
 
 string errorMessage = "Test message";
 
@@ -99,7 +100,7 @@ std::vector<std::string> listTxtFiles(const char* path) {
     return txtFiles;
 }
 
-std::string loadChordsFromFile(void)
+std::string loadChordsFromFile(std::string filePath)
 {
     displayLineOne = "Starting load";
     std::string chordData;
@@ -116,7 +117,7 @@ std::string loadChordsFromFile(void)
     f_mount(&fsi.GetSDFileSystem(), "/", 1);
 
     // Try to open the file
-    fr = f_open(&file, "autumnLeaves.txt", FA_READ);
+    fr = f_open(&file, filePath.c_str(), FA_READ);
 
     if (fr == FR_OK) {
         // Read the entire file into the buffer
@@ -127,7 +128,7 @@ std::string loadChordsFromFile(void)
             
             // Now 'buffer' contains the entire file content as a C-style string
             std::string fileContent(buffer);
-            displayLineOne = fileContent;
+            displayLineOne = filePath;
             chordData = fileContent;
 
         } else {
@@ -272,14 +273,19 @@ std::vector<std::string> parseChords(const std::string& chordString) {
     return chords;
 }
 
+void loadSong(string fileName) 
+{
+    string fileChords = loadChordsFromFile(fileName);
+    currentSongChords = parseChords(fileChords);
+    playhead = 0;
+}
+
 int main(void)
 {
     patch.Init(); // Initialize hardware (daisy seed, and patch)
 
     fileList = listTxtFiles("/");
-    string fileChords = loadChordsFromFile();
-
-   currentSongChords = parseChords(fileChords);
+    loadSong(fileList[0]);
 
     patch.StartAdc();
     while(1)
@@ -302,6 +308,12 @@ void ProcessEncoder()
     }
     if (patch.encoder.FallingEdge()) {
         encoderIsHeld = false;
+        if (!tabChangeInProcess && displayTabIndex == 1) {
+            loadSong(fileList[fileListCursor]);
+            // TODO ew, abstract this
+            loadedFileIndex = fileListCursor;
+        }
+        tabChangeInProcess = false;
     }
     int increment = patch.encoder.Increment();
     if (increment != 0)
@@ -309,6 +321,7 @@ void ProcessEncoder()
         if (encoderIsHeld) {
             displayTabIndex++;
             displayTabIndex = displayTabIndex % 2;
+            tabChangeInProcess = true;
         } else {
             // navigate file system
             int fileListSize = static_cast<int>(fileList.size());
@@ -440,7 +453,7 @@ void Process()
     // Migration TODO: Update display
     displayLineTwo = "Current chord:";
     displayLineThree = chordDisplay; 
-
+    
     // Quantize input to output
     targetScale = targetChord->chordScale;
 
@@ -525,6 +538,7 @@ void UpdateOled()
             patch.display.SetCursor(0, (i + 1)*10);
             string str;
             fileListCursor == i ? str += ">" : str += " ";
+            loadedFileIndex == i ? str += "*" : str += " ";
             str += fileList[i];
             char* cstr = &str[0];
             patch.display.WriteString(cstr, Font_7x10, true);
@@ -539,7 +553,17 @@ void UpdateOutputs()
 }
 
 
-// TODOs
+// Eng TODOs
 // Handle empty SD card
+// Handle file list changing
+// Actually init properly when loading files
+// Only init SD card once
+// Reset index on restart
+
+// Product
+// 2 jazz params
+// Support more than 4 files
+// Jazz param visualization
+// Quantizer visualization
 
 
