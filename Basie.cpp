@@ -22,12 +22,21 @@ static DaisyPatch hw;
 SdmmcHandler   sd;
 FatFSInterface fsi;
 
+
+DIR dir;
+FILINFO fno;
+
 FIL file;       // File object
 FRESULT fr;     // FatFs return code
 UINT br;        // Read count
 
+std::vector<std::string> fileList;
+int fileListCursor = 0;
+
 int displayTabIndex = 1;
 bool encoderIsHeld = false;
+
+string errorMessage = "Test message";
 
 constexpr size_t bufferSize = 4096; // Example size, adjust as needed
 char buffer[bufferSize] = {0};
@@ -48,6 +57,46 @@ int chordType = 0;
 
 
 // ----------------- //
+
+
+std::vector<std::string> listTxtFiles(const char* path) {
+
+    std::vector<std::string> txtFiles;
+
+    // Init SD Card
+    SdmmcHandler::Config sd_cfg;
+    sd_cfg.Defaults();
+    sd.Init(sd_cfg);
+
+    // Links libdaisy i/o to fatfs driver.
+    fsi.Init(FatFSInterface::Config::MEDIA_SD);
+
+    // Mount SD Card
+    f_mount(&fsi.GetSDFileSystem(), "/", 1);
+
+    fr = f_opendir(&dir, path);  // Open the directory
+    if (fr == FR_OK) {
+        for (;;) {
+            fr = f_readdir(&dir, &fno);  // Read a directory item
+            if (fr != FR_OK || fno.fname[0] == 0) break;  // Break on error or end of dir
+            if (fno.fattrib & AM_DIR) {
+                // It's a directory, you can ignore or handle accordingly
+            } else { 
+                // It's a file, check if it's a .txt file
+                std::string fileName = fno.fname;
+                if (fileName.size() >= 4 && fileName.substr(fileName.size() - 4) == ".txt") {
+                    txtFiles.push_back(fileName);
+                    errorMessage = fileName;
+                }
+            }
+        }
+        f_closedir(&dir);
+    } else {
+        errorMessage = "Failed to load directory"; 
+    }
+
+    return txtFiles;
+}
 
 std::string loadChordsFromFile(void)
 {
@@ -226,6 +275,7 @@ int main(void)
 {
     patch.Init(); // Initialize hardware (daisy seed, and patch)
 
+    fileList = listTxtFiles("/");
     string fileChords = loadChordsFromFile();
 
    currentSongChords = parseChords(fileChords);
@@ -252,13 +302,23 @@ void ProcessEncoder()
     if (patch.encoder.FallingEdge()) {
         encoderIsHeld = false;
     }
-    if (patch.encoder.Increment() != 0)
+    int increment = patch.encoder.Increment();
+    if (increment != 0)
     {
         if (encoderIsHeld) {
             displayTabIndex++;
             displayTabIndex = displayTabIndex % 2;
         } else {
             // navigate file system
+            int fileListSize = static_cast<int>(fileList.size());
+            fileListCursor += increment;
+
+            // Wrap around logic
+            if (fileListCursor >= fileListSize) {
+                fileListCursor = 0;
+            } else if (fileListCursor < 0) {
+                fileListCursor = fileListSize > 0 ? fileListSize - 1 : 0;
+            }
         }
     }
     UpdateOled();
@@ -455,6 +515,19 @@ void UpdateOled()
 
         patch.display.SetCursor(0, 0);
         patch.display.WriteString(cstr, Font_7x10, true);
+
+        patch.display.SetCursor(0, 10);
+        str = errorMessage;
+        patch.display.WriteString(cstr, Font_7x10, true);
+
+        for (std::size_t i = 0; i < fileList.size(); i++ ) {
+            patch.display.SetCursor(0, (i + 1)*10);
+            string str = "";
+            fileListCursor == i ? str += ">" : " ";
+            str += fileList[i];
+            char* cstr = &str[0];
+            patch.display.WriteString(cstr, Font_7x10, true);
+        }
     }
 
     patch.display.Update();
@@ -463,5 +536,9 @@ void UpdateOled()
 void UpdateOutputs()
 {
 }
+
+
+// TODOs
+// Handle empty SD card
 
 
