@@ -32,6 +32,7 @@ UINT br;        // Read count
 
 std::vector<std::string> fileList;
 int fileListCursor = 0;
+int loadedFileIndex = 0;
 
 int displayTabIndex = 1;
 bool encoderIsHeld = false;
@@ -522,8 +523,8 @@ void UpdateOled()
 
         for (std::size_t i = 0; i < fileList.size(); i++ ) {
             patch.display.SetCursor(0, (i + 1)*10);
-            string str = "";
-            fileListCursor == i ? str += ">" : " ";
+            string str;
+            fileListCursor == i ? str += ">" : str += " ";
             str += fileList[i];
             char* cstr = &str[0];
             patch.display.WriteString(cstr, Font_7x10, true);
