@@ -42,6 +42,8 @@ bool tabChangeInProcess = false;
 
 bool beatChanging = false;
 
+int activeNotes [4];
+
 string errorMessage = "Test message";
 
 constexpr size_t bufferSize = 4096; // Example size, adjust as needed
@@ -81,6 +83,12 @@ void MIDISendNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
     data[2] = velocity & 0x7F;
 
     patch.midi.SendMessage(data, 3);
+}
+
+void clearMidi() {
+    for (int i = 0; i < 4; i++){
+        MIDISendNoteOff(0, activeNotes[i], 100);
+    }
 }
 
 std::vector<std::string> listTxtFiles(const char* path) {
@@ -347,28 +355,29 @@ void Process()
         // setRGBBrightness(quantizerLights[i], 0, 0, 0);
         // setRGBBrightness(quantizer2Lights[i], 0, 0, 0);
     }
+    if (beatChanging) {
+        clearMidi();
+    }
 
     for (int i = 0; i < chordToneCount; i++)
     {   
-        // int chordTone = targetChord->tones[i];
+        int chordTone = targetChord->tones[i];
         // TODO Abstract this
         // Migration TODO: Reimplement voicing type
         // Migration TODO: UI
-        // int targetLightIndex = (chordRootIndex + chordTone) % 12;
-        // setRGBBrightness(chordLights[targetLightIndex], 0.1, 0.1, 0.05);
-        if (i < 4)
+        int targetMidiNote = 36 + chordRootIndex + chordTone;
+        if (beatChanging == true && i < 4)
         {
-            // Migration TODO: UI
-            // setRGBBrightness(chordLights[targetLightIndex], 0.4, 0.4, 0.2);
-        }
-        if (i == 0) {
-            // Migration TODO: UI
-            // setRGBBrightness(chordLights[targetLightIndex], 1.0, 1.0, 1.0);
+            if (i > 0) {
+                targetMidiNote = targetMidiNote + 12;
+            }
+            activeNotes[i] = targetMidiNote;
+            MIDISendNoteOn(0, targetMidiNote, 100);
         }
 
-        // float chordToneAsFloat = (float)chordTone;
-        // float noteVoltage = (chordToneAsFloat / 12.0) + chordRootOffsetVoltage;
-        // chordVoltages[i] = noteVoltage;
+        // int targetLightIndex = (chordRootIndex + chordTone) % 12;
+        // int targetLightIndex = (chordRootIndex + chordTone) % 12;
+        // setRGBBrightness(chordLights[targetLightIndex], 0.1, 0.1, 0.05);
     }
 
     // Write the chord tones to output
@@ -381,12 +390,6 @@ void Process()
     // outputs[CV_OUTPUT_5].setVoltage(chordVoltages[4]);
     // outputs[CV_OUTPUT_6].setVoltage(chordVoltages[5]);
     // outputs[CV_OUTPUT_7].setVoltage(chordVoltages[6]);
-
-    if (beatChanging == true)
-    {
-        MIDISendNoteOff(0, 40, 100);
-        MIDISendNoteOn(0, 40, 100);
-    }
 
     // Update the display with human names for the current chord
     chordDisplay = noteDisplayNames[chordRootIndex] + targetChord->displayName;
