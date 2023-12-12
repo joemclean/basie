@@ -4,6 +4,7 @@
 #include <array>
 #include "src/theory.hpp"
 #include "src/quantizer.hpp"
+#include "src/sdhandler.hpp"
 
 #include "fatfs.h"
 
@@ -21,16 +22,6 @@ DaisyPatch patch;
 
 static DaisyPatch hw;
 
-SdmmcHandler   sd;
-FatFSInterface fsi;
-
-DIR dir;
-FILINFO fno;
-
-FIL file;       // File object
-FRESULT fr;     // FatFs return code
-UINT br;        // Read count
-
 std::vector<std::string> fileList;
 int fileListCursor = 0;
 int loadedFileIndex = 0;
@@ -45,9 +36,6 @@ bool beatChanging = false;
 int activeNotes [4];
 
 string errorMessage = "Test message";
-
-constexpr size_t bufferSize = 4096; // Example size, adjust as needed
-char buffer[bufferSize] = {0};
 
 int selectedSongIndex = 0;
 string chordDisplay = "";
@@ -89,88 +77,6 @@ void clearMidi() {
     for (int i = 0; i < 4; i++){
         MIDISendNoteOff(0, activeNotes[i], 100);
     }
-}
-
-std::vector<std::string> listTxtFiles(const char* path) {
-
-    std::vector<std::string> txtFiles;
-
-    // Init SD Card
-    SdmmcHandler::Config sd_cfg;
-    sd_cfg.Defaults();
-    sd.Init(sd_cfg);
-
-    // Links libdaisy i/o to fatfs driver.
-    fsi.Init(FatFSInterface::Config::MEDIA_SD);
-
-    // Mount SD Card
-    f_mount(&fsi.GetSDFileSystem(), "/", 1);
-
-    fr = f_opendir(&dir, path);  // Open the directory
-    if (fr == FR_OK) {
-        for (;;) {
-            fr = f_readdir(&dir, &fno);  // Read a directory item
-            if (fr != FR_OK || fno.fname[0] == 0) break;  // Break on error or end of dir
-            if (fno.fattrib & AM_DIR) {
-                // It's a directory, you can ignore or handle accordingly
-            } else { 
-                // It's a file, check if it's a .txt file
-                std::string fileName = fno.fname;
-                if (fileName.size() >= 4 && fileName.substr(fileName.size() - 4) == ".txt") {
-                    txtFiles.push_back(fileName);
-                    errorMessage = fileName;
-                }
-            }
-        }
-        f_closedir(&dir);
-    } else {
-        errorMessage = "Failed to load directory"; 
-    }
-
-    return txtFiles;
-}
-
-std::string loadChordsFromFile(std::string filePath)
-{
-    displayLineOne = "Starting load";
-    std::string chordData;
-
-    // Init SD Card
-    SdmmcHandler::Config sd_cfg;
-    sd_cfg.Defaults();
-    sd.Init(sd_cfg);
-
-    // Links libdaisy i/o to fatfs driver.
-    fsi.Init(FatFSInterface::Config::MEDIA_SD);
-
-    // Mount SD Card
-    f_mount(&fsi.GetSDFileSystem(), "/", 1);
-
-    // Try to open the file
-    fr = f_open(&file, filePath.c_str(), FA_READ);
-
-    if (fr == FR_OK) {
-        // Read the entire file into the buffer
-        fr = f_read(&file, buffer, bufferSize - 1, &br);
-        if (fr == FR_OK) {
-            // Ensure there's a null terminator at the end of the read data
-            buffer[br] = '\0';
-            
-            // Now 'buffer' contains the entire file content as a C-style string
-            std::string fileContent(buffer);
-            displayLineOne = filePath;
-            chordData = fileContent;
-
-        } else {
-            displayLineOne = "Read error: " + std::to_string(fr);
-        }
-        // Close the file
-        f_close(&file);
-    } else {
-        displayLineOne = "File open error";
-    }
-
-    return chordData;
 }
 
 void UpdateControls();
@@ -217,8 +123,10 @@ std::vector<std::string> parseChords(const std::string& chordString) {
 
 void loadSong(string fileName) 
 {
+    clearMidi();
     string fileChords = loadChordsFromFile(fileName);
     currentSongChords = parseChords(fileChords);
+    displayLineOne = fileName;
     playhead = 0;
 }
 

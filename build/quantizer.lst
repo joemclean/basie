@@ -1,0 +1,1393 @@
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 4
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"quantizer.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text._Z15quantizeToScaleRKfS0_RKSt5arrayIfLj12EES0_,"ax",%progbits
+  19              		.align	1
+  20              		.global	_Z15quantizeToScaleRKfS0_RKSt5arrayIfLj12EES0_
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	_Z15quantizeToScaleRKfS0_RKSt5arrayIfLj12EES0_:
+  26              	.LVL0:
+  27              	.LFB1977:
+  28              		.file 1 "src/quantizer.cpp"
+   1:src/quantizer.cpp **** #include "quantizer.hpp"
+   2:src/quantizer.cpp **** #include <math.h>
+   3:src/quantizer.cpp **** 
+   4:src/quantizer.cpp **** std::pair<float, int> quantizeToScale(const float& noteInVoltage, const float& chordRootOffsetVolta
+   5:src/quantizer.cpp **** {
+  29              		.loc 1 5 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 4, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+   6:src/quantizer.cpp ****     float whole, fractional;
+  33              		.loc 1 6 5 view .LVU1
+   7:src/quantizer.cpp ****     float jazzThreshold = 1.0 - jazzAmount;
+  34              		.loc 1 7 5 view .LVU2
+   5:src/quantizer.cpp ****     float whole, fractional;
+  35              		.loc 1 5 1 is_stmt 0 view .LVU3
+  36 0000 30B5     		push	{r4, r5, lr}
+  37              		.cfi_def_cfa_offset 12
+  38              		.cfi_offset 4, -12
+  39              		.cfi_offset 5, -8
+  40              		.cfi_offset 14, -4
+  41              		.loc 1 7 11 view .LVU4
+  42 0002 039D     		ldr	r5, [sp, #12]
+  43 0004 B7EE007A 		vmov.f32	s14, #1.0e+0
+   8:src/quantizer.cpp ****     whole = floor(noteInVoltage);
+  44              		.loc 1 8 18 view .LVU5
+  45 0008 D1ED006A 		vldr.32	s13, [r1]
+   7:src/quantizer.cpp ****     float jazzThreshold = 1.0 - jazzAmount;
+  46              		.loc 1 7 11 view .LVU6
+  47 000c 95ED006A 		vldr.32	s12, [r5]
+  48              	.LBB42:
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 2
+
+
+  49              	.LBB43:
+  50              		.file 2 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath"
+   1:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // -*- C++ -*- C forwarding header.
+   2:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+   3:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // Copyright (C) 1997-2020 Free Software Foundation, Inc.
+   4:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** //
+   5:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // This file is part of the GNU ISO C++ Library.  This library is free
+   6:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // software; you can redistribute it and/or modify it under the
+   7:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // terms of the GNU General Public License as published by the
+   8:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // Free Software Foundation; either version 3, or (at your option)
+   9:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // any later version.
+  10:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  11:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // This library is distributed in the hope that it will be useful,
+  12:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // GNU General Public License for more details.
+  15:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  16:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // Under Section 7 of GPL version 3, you are granted additional
+  17:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // permissions described in the GCC Runtime Library Exception, version
+  18:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // 3.1, as published by the Free Software Foundation.
+  19:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  20:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // You should have received a copy of the GNU General Public License and
+  21:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // a copy of the GCC Runtime Library Exception along with this program;
+  22:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+  23:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // <http://www.gnu.org/licenses/>.
+  24:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  25:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** /** @file include/cmath
+  26:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****  *  This is a Standard C++ Library file.  You should @c \#include this file
+  27:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****  *  in your programs, rather than any of the @a *.h implementation files.
+  28:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****  *
+  29:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****  *  This is the C++ version of the Standard C Library header @c math.h,
+  30:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****  *  and its contents are (mostly) the same as that header, but are all
+  31:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****  *  contained in the namespace @c std (except for names which are defined
+  32:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****  *  as macros in C).
+  33:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****  */
+  34:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  35:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** //
+  36:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // ISO C++ 14882: 26.5  C library
+  37:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** //
+  38:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  39:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #pragma GCC system_header
+  40:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  41:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #include <bits/c++config.h>
+  42:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #include <bits/cpp_type_traits.h>
+  43:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #include <ext/type_traits.h>
+  44:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #define _GLIBCXX_INCLUDE_NEXT_C_HEADERS
+  45:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #include_next <math.h>
+  46:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef _GLIBCXX_INCLUDE_NEXT_C_HEADERS
+  47:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #include <bits/std_abs.h>
+  48:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  49:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef _GLIBCXX_CMATH
+  50:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #define _GLIBCXX_CMATH 1
+  51:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  52:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** // Get rid of those macros defined in <math.h> in lieu of real functions.
+  53:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef div
+  54:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef acos
+  55:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef asin
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 3
+
+
+  56:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef atan
+  57:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef atan2
+  58:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef ceil
+  59:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef cos
+  60:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef cosh
+  61:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef exp
+  62:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef fabs
+  63:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef floor
+  64:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef fmod
+  65:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef frexp
+  66:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef ldexp
+  67:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef log
+  68:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef log10
+  69:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef modf
+  70:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef pow
+  71:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef sin
+  72:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef sinh
+  73:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef sqrt
+  74:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef tan
+  75:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #undef tanh
+  76:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  77:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** extern "C++"
+  78:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** {
+  79:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** namespace std _GLIBCXX_VISIBILITY(default)
+  80:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** {
+  81:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** _GLIBCXX_BEGIN_NAMESPACE_VERSION
+  82:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  83:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::acos;
+  84:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  85:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+  86:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+  87:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   acos(float __x)
+  88:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_acosf(__x); }
+  89:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  90:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+  91:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   acos(long double __x)
+  92:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_acosl(__x); }
+  93:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+  94:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+  95:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp>
+  96:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+  97:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value, 
+  98:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****                                     double>::__type
+  99:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     acos(_Tp __x)
+ 100:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     { return __builtin_acos(__x); }
+ 101:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 102:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::asin;
+ 103:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 104:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 105:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 106:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   asin(float __x)
+ 107:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_asinf(__x); }
+ 108:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 109:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 110:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   asin(long double __x)
+ 111:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_asinl(__x); }
+ 112:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 4
+
+
+ 113:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 114:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp>
+ 115:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+ 116:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
+ 117:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****                                     double>::__type
+ 118:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     asin(_Tp __x)
+ 119:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     { return __builtin_asin(__x); }
+ 120:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 121:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::atan;
+ 122:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 123:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 124:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 125:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   atan(float __x)
+ 126:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_atanf(__x); }
+ 127:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 128:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 129:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   atan(long double __x)
+ 130:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_atanl(__x); }
+ 131:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+ 132:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 133:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp>
+ 134:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+ 135:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
+ 136:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****                                     double>::__type
+ 137:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     atan(_Tp __x)
+ 138:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     { return __builtin_atan(__x); }
+ 139:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 140:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::atan2;
+ 141:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 142:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 143:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 144:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   atan2(float __y, float __x)
+ 145:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_atan2f(__y, __x); }
+ 146:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 147:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 148:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   atan2(long double __y, long double __x)
+ 149:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_atan2l(__y, __x); }
+ 150:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+ 151:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 152:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp, typename _Up>
+ 153:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+ 154:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__promote_2<_Tp, _Up>::__type
+ 155:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     atan2(_Tp __y, _Up __x)
+ 156:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     {
+ 157:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****       typedef typename __gnu_cxx::__promote_2<_Tp, _Up>::__type __type;
+ 158:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****       return atan2(__type(__y), __type(__x));
+ 159:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     }
+ 160:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 161:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::ceil;
+ 162:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 163:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 164:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 165:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   ceil(float __x)
+ 166:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_ceilf(__x); }
+ 167:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 168:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 169:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   ceil(long double __x)
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 5
+
+
+ 170:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_ceill(__x); }
+ 171:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+ 172:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 173:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp>
+ 174:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+ 175:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value, 
+ 176:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****                                     double>::__type
+ 177:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     ceil(_Tp __x)
+ 178:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     { return __builtin_ceil(__x); }
+ 179:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 180:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::cos;
+ 181:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 182:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 183:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 184:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   cos(float __x)
+ 185:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_cosf(__x); }
+ 186:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 187:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 188:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   cos(long double __x)
+ 189:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_cosl(__x); }
+ 190:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+ 191:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 192:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp>
+ 193:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+ 194:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
+ 195:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****                                     double>::__type
+ 196:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     cos(_Tp __x)
+ 197:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     { return __builtin_cos(__x); }
+ 198:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 199:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::cosh;
+ 200:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 201:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 202:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 203:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   cosh(float __x)
+ 204:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_coshf(__x); }
+ 205:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 206:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 207:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   cosh(long double __x)
+ 208:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_coshl(__x); }
+ 209:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+ 210:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 211:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp>
+ 212:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+ 213:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
+ 214:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****                                     double>::__type
+ 215:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     cosh(_Tp __x)
+ 216:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     { return __builtin_cosh(__x); }
+ 217:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 218:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::exp;
+ 219:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 220:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 221:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 222:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   exp(float __x)
+ 223:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_expf(__x); }
+ 224:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 225:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 226:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   exp(long double __x)
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 6
+
+
+ 227:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_expl(__x); }
+ 228:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+ 229:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 230:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp>
+ 231:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+ 232:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
+ 233:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****                                     double>::__type
+ 234:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     exp(_Tp __x)
+ 235:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     { return __builtin_exp(__x); }
+ 236:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 237:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::fabs;
+ 238:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 239:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 240:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 241:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   fabs(float __x)
+ 242:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_fabsf(__x); }
+ 243:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 244:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 245:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   fabs(long double __x)
+ 246:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_fabsl(__x); }
+ 247:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #endif
+ 248:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 249:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   template<typename _Tp>
+ 250:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     inline _GLIBCXX_CONSTEXPR
+ 251:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
+ 252:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****                                     double>::__type
+ 253:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     fabs(_Tp __x)
+ 254:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****     { return __builtin_fabs(__x); }
+ 255:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 256:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   using ::floor;
+ 257:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** 
+ 258:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 259:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 260:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   floor(float __x)
+ 261:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_floorf(__x); }
+  51              		.loc 2 261 28 view .LVU7
+  52 0010 BBFE665A 		vrintm.f32	s10, s13
+  53 0014 F0EE474A 		vmov.f32	s9, s14
+  54              	.LBE43:
+  55              	.LBE42:
+   7:src/quantizer.cpp ****     whole = floor(noteInVoltage);
+  56              		.loc 1 7 11 view .LVU8
+  57 0018 37EE466A 		vsub.f32	s12, s14, s12
+  58              	.LVL1:
+  59              		.loc 1 8 5 is_stmt 1 view .LVU9
+  60              	.LBB45:
+  61              	.LBI42:
+ 260:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath ****   { return __builtin_floorf(__x); }
+  62              		.loc 2 260 3 view .LVU10
+  63              	.LBB44:
+  64              		.loc 2 261 5 view .LVU11
+  65              		.loc 2 261 5 is_stmt 0 view .LVU12
+  66              	.LBE44:
+  67              	.LBE45:
+   9:src/quantizer.cpp ****     fractional = noteInVoltage - whole;
+  68              		.loc 1 9 5 is_stmt 1 view .LVU13
+  69              	.LBB46:
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 7
+
+
+  70              	.LBB47:
+  71              	.LBB48:
+  10:src/quantizer.cpp ****     int nearestScaleToneIndex;
+  11:src/quantizer.cpp ****     float currentLowestNoteDistance = 1.0;
+  12:src/quantizer.cpp ****     for (int i = 0; i < 12; i++) {
+  13:src/quantizer.cpp ****         if ((float)targetScale[i] >= jazzThreshold) {
+  14:src/quantizer.cpp ****             float indexAsFloat = (float)i;
+  15:src/quantizer.cpp ****             float indexAsVoltage = (indexAsFloat/12) + chordRootOffsetVoltage;
+  72              		.loc 1 15 56 is_stmt 0 view .LVU14
+  73 001c D2ED005A 		vldr.32	s11, [r2]
+  74              	.LBE48:
+  75              	.LBE47:
+  76              	.LBE46:
+   9:src/quantizer.cpp ****     fractional = noteInVoltage - whole;
+  77              		.loc 1 9 16 view .LVU15
+  78 0020 76EEC56A 		vsub.f32	s13, s13, s10
+  79              	.LVL2:
+  10:src/quantizer.cpp ****     int nearestScaleToneIndex;
+  80              		.loc 1 10 5 is_stmt 1 view .LVU16
+  11:src/quantizer.cpp ****     for (int i = 0; i < 12; i++) {
+  81              		.loc 1 11 5 view .LVU17
+  12:src/quantizer.cpp ****         if ((float)targetScale[i] >= jazzThreshold) {
+  82              		.loc 1 12 5 view .LVU18
+  83              	.LBB55:
+  12:src/quantizer.cpp ****         if ((float)targetScale[i] >= jazzThreshold) {
+  84              		.loc 1 12 23 view .LVU19
+  12:src/quantizer.cpp ****         if ((float)targetScale[i] >= jazzThreshold) {
+  85              		.loc 1 12 14 is_stmt 0 view .LVU20
+  86 0024 0022     		movs	r2, #0
+  87              	.LVL3:
+  88              	.L7:
+  12:src/quantizer.cpp ****         if ((float)targetScale[i] >= jazzThreshold) {
+  89              		.loc 1 12 14 view .LVU21
+  90              	.LBE55:
+  13:src/quantizer.cpp ****             float indexAsFloat = (float)i;
+  91              		.loc 1 13 9 is_stmt 1 view .LVU22
+  92              	.LBB56:
+  93              	.LBB54:
+  13:src/quantizer.cpp ****             float indexAsFloat = (float)i;
+  94              		.loc 1 13 13 is_stmt 0 view .LVU23
+  95 0026 F3EC017A 		vldmia.32	r3!, {s15}
+  13:src/quantizer.cpp ****             float indexAsFloat = (float)i;
+  96              		.loc 1 13 9 view .LVU24
+  97 002a F4EEC67A 		vcmpe.f32	s15, s12
+  98 002e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  99 0032 1CDB     		blt	.L2
+ 100              	.LBB53:
+  14:src/quantizer.cpp ****             float indexAsVoltage = (indexAsFloat/12) + chordRootOffsetVoltage;
+ 101              		.loc 1 14 13 is_stmt 1 view .LVU25
+ 102              	.LVL4:
+ 103              		.loc 1 15 13 view .LVU26
+  14:src/quantizer.cpp ****             float indexAsVoltage = (indexAsFloat/12) + chordRootOffsetVoltage;
+ 104              		.loc 1 14 19 is_stmt 0 view .LVU27
+ 105 0034 07EE902A 		vmov	s15, r2	@ int
+ 106              		.loc 1 15 49 view .LVU28
+ 107 0038 B2EE084A 		vmov.f32	s8, #1.2e+1
+  14:src/quantizer.cpp ****             float indexAsVoltage = (indexAsFloat/12) + chordRootOffsetVoltage;
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 8
+
+
+ 108              		.loc 1 14 19 view .LVU29
+ 109 003c F8EEE73A 		vcvt.f32.s32	s7, s15
+ 110              	.LVL5:
+ 111              		.loc 1 15 49 view .LVU30
+ 112 0040 C3EE847A 		vdiv.f32	s15, s7, s8
+ 113              		.loc 1 15 19 view .LVU31
+ 114 0044 77EEA57A 		vadd.f32	s15, s15, s11
+ 115              	.LVL6:
+  16:src/quantizer.cpp ****             if (indexAsVoltage > 1.0) {
+ 116              		.loc 1 16 13 is_stmt 1 view .LVU32
+ 117 0048 F4EEE47A 		vcmpe.f32	s15, s9
+ 118 004c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  17:src/quantizer.cpp ****                 indexAsVoltage = indexAsVoltage - 1;
+ 119              		.loc 1 17 17 view .LVU33
+ 120              		.loc 1 17 32 is_stmt 0 view .LVU34
+ 121 0050 C8BF     		it	gt
+ 122 0052 77EEE47A 		vsubgt.f32	s15, s15, s9
+ 123              	.LVL7:
+  18:src/quantizer.cpp ****             }
+  19:src/quantizer.cpp ****             float noteDistance = abs(indexAsVoltage - fractional);
+ 124              		.loc 1 19 13 is_stmt 1 view .LVU35
+ 125              	.LBB49:
+ 126              	.LBI49:
+ 127              		.file 3 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h"
+   1:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // -*- C++ -*- C library enhancements header.
+   2:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+   3:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // Copyright (C) 2016-2020 Free Software Foundation, Inc.
+   4:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** //
+   5:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // This file is part of the GNU ISO C++ Library.  This library is free
+   6:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // software; you can redistribute it and/or modify it under the
+   7:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // terms of the GNU General Public License as published by the
+   8:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // Free Software Foundation; either version 3, or (at your option)
+   9:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // any later version.
+  10:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  11:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // This library is distributed in the hope that it will be useful,
+  12:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // GNU General Public License for more details.
+  15:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  16:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // Under Section 7 of GPL version 3, you are granted additional
+  17:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // permissions described in the GCC Runtime Library Exception, version
+  18:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // 3.1, as published by the Free Software Foundation.
+  19:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  20:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // You should have received a copy of the GNU General Public License and
+  21:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // a copy of the GCC Runtime Library Exception along with this program;
+  22:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+  23:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // <http://www.gnu.org/licenses/>.
+  24:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  25:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** /** @file include/bits/std_abs.h
+  26:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****  *  This is an internal header file, included by other library headers.
+  27:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****  *  Do not attempt to use it directly. @headername{cmath, cstdlib}
+  28:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****  */
+  29:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  30:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #ifndef _GLIBCXX_BITS_STD_ABS_H
+  31:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #define _GLIBCXX_BITS_STD_ABS_H
+  32:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  33:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #pragma GCC system_header
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 9
+
+
+  34:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  35:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #include <bits/c++config.h>
+  36:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  37:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #define _GLIBCXX_INCLUDE_NEXT_C_HEADERS
+  38:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #include_next <stdlib.h>
+  39:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #ifdef __CORRECT_ISO_CPP_MATH_H_PROTO
+  40:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** # include_next <math.h>
+  41:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #endif
+  42:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #undef _GLIBCXX_INCLUDE_NEXT_C_HEADERS
+  43:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  44:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #undef abs
+  45:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  46:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** extern "C++"
+  47:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** {
+  48:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** namespace std _GLIBCXX_VISIBILITY(default)
+  49:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** {
+  50:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** _GLIBCXX_BEGIN_NAMESPACE_VERSION
+  51:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  52:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   using ::abs;
+  53:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  54:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #ifndef __CORRECT_ISO_CPP_STDLIB_H_PROTO
+  55:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   inline long
+  56:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   abs(long __i) { return __builtin_labs(__i); }
+  57:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #endif
+  58:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  59:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #ifdef _GLIBCXX_USE_LONG_LONG
+  60:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   inline long long
+  61:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   abs(long long __x) { return __builtin_llabs (__x); }
+  62:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #endif
+  63:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  64:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // _GLIBCXX_RESOLVE_LIB_DEFECTS
+  65:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // 2192. Validity and return type of std::abs(0u) is unclear
+  66:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // 2294. <cstdlib> should declare abs(double)
+  67:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** // 2735. std::abs(short), std::abs(signed char) and others should return int
+  68:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  69:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+  70:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   inline _GLIBCXX_CONSTEXPR double
+  71:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   abs(double __x)
+  72:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   { return __builtin_fabs(__x); }
+  73:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h **** 
+  74:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   inline _GLIBCXX_CONSTEXPR float
+  75:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   abs(float __x)
+ 128              		.loc 3 75 3 view .LVU36
+ 129              	.LBB50:
+  76:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h ****   { return __builtin_fabsf(__x); }
+ 130              		.loc 3 76 5 view .LVU37
+ 131              	.LBE50:
+ 132              	.LBE49:
+ 133              		.loc 1 19 37 is_stmt 0 view .LVU38
+ 134 0056 77EEE67A 		vsub.f32	s15, s15, s13
+ 135              	.LVL8:
+ 136              	.LBB52:
+ 137              	.LBB51:
+ 138              		.loc 3 76 31 view .LVU39
+ 139 005a F0EEE77A 		vabs.f32	s15, s15
+ 140              	.LVL9:
+ 141              		.loc 3 76 31 view .LVU40
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 10
+
+
+ 142              	.LBE51:
+ 143              	.LBE52:
+  20:src/quantizer.cpp ****             if (noteDistance < currentLowestNoteDistance) {
+ 144              		.loc 1 20 13 is_stmt 1 view .LVU41
+ 145 005e F4EEC77A 		vcmpe.f32	s15, s14
+ 146 0062 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 147              	.LVL10:
+  21:src/quantizer.cpp ****                 currentLowestNoteDistance = noteDistance;
+ 148              		.loc 1 21 43 is_stmt 0 view .LVU42
+ 149 0066 44BF     		itt	mi
+ 150 0068 B0EE677A 		vmovmi.f32	s14, s15
+ 151              	.LVL11:
+  20:src/quantizer.cpp ****             if (noteDistance < currentLowestNoteDistance) {
+ 152              		.loc 1 20 13 view .LVU43
+ 153 006c 1446     		movmi	r4, r2
+ 154              	.LVL12:
+ 155              	.L2:
+  20:src/quantizer.cpp ****             if (noteDistance < currentLowestNoteDistance) {
+ 156              		.loc 1 20 13 view .LVU44
+ 157              	.LBE53:
+ 158              	.LBE54:
+  12:src/quantizer.cpp ****         if ((float)targetScale[i] >= jazzThreshold) {
+ 159              		.loc 1 12 5 is_stmt 1 discriminator 2 view .LVU45
+ 160 006e 0132     		adds	r2, r2, #1
+ 161              	.LVL13:
+  12:src/quantizer.cpp ****         if ((float)targetScale[i] >= jazzThreshold) {
+ 162              		.loc 1 12 23 discriminator 2 view .LVU46
+ 163 0070 0C2A     		cmp	r2, #12
+ 164 0072 D8D1     		bne	.L7
+ 165              	.LBE56:
+  22:src/quantizer.cpp ****                 nearestScaleToneIndex = i;
+  23:src/quantizer.cpp ****             }
+  24:src/quantizer.cpp ****         }
+  25:src/quantizer.cpp ****     }
+  26:src/quantizer.cpp ****     float baseNoteVoltage = (float)nearestScaleToneIndex / 12;
+ 166              		.loc 1 26 5 view .LVU47
+ 167              	.LVL14:
+  27:src/quantizer.cpp ****     float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
+ 168              		.loc 1 27 5 view .LVU48
+  28:src/quantizer.cpp ****     return std::make_pair(targetNoteVoltage, nearestScaleToneIndex);
+ 169              		.loc 1 28 5 view .LVU49
+ 170              	.LBB57:
+ 171              	.LBI57:
+ 172              		.file 4 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h"
+   1:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // Pair implementation -*- C++ -*-
+   2:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+   3:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // Copyright (C) 2001-2020 Free Software Foundation, Inc.
+   4:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** //
+   5:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // This file is part of the GNU ISO C++ Library.  This library is free
+   6:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // software; you can redistribute it and/or modify it under the
+   7:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // terms of the GNU General Public License as published by the
+   8:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // Free Software Foundation; either version 3, or (at your option)
+   9:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // any later version.
+  10:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  11:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // This library is distributed in the hope that it will be useful,
+  12:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 11
+
+
+  14:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // GNU General Public License for more details.
+  15:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  16:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // Under Section 7 of GPL version 3, you are granted additional
+  17:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // permissions described in the GCC Runtime Library Exception, version
+  18:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // 3.1, as published by the Free Software Foundation.
+  19:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  20:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // You should have received a copy of the GNU General Public License and
+  21:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // a copy of the GCC Runtime Library Exception along with this program;
+  22:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+  23:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** // <http://www.gnu.org/licenses/>.
+  24:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  25:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** /*
+  26:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  *
+  27:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * Copyright (c) 1994
+  28:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * Hewlett-Packard Company
+  29:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  *
+  30:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * Permission to use, copy, modify, distribute and sell this software
+  31:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * and its documentation for any purpose is hereby granted without fee,
+  32:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * provided that the above copyright notice appear in all copies and
+  33:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * that both that copyright notice and this permission notice appear
+  34:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * in supporting documentation.  Hewlett-Packard Company makes no
+  35:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * representations about the suitability of this software for any
+  36:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * purpose.  It is provided "as is" without express or implied warranty.
+  37:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  *
+  38:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  *
+  39:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * Copyright (c) 1996,1997
+  40:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * Silicon Graphics Computer Systems, Inc.
+  41:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  *
+  42:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * Permission to use, copy, modify, distribute and sell this software
+  43:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * and its documentation for any purpose is hereby granted without fee,
+  44:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * provided that the above copyright notice appear in all copies and
+  45:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * that both that copyright notice and this permission notice appear
+  46:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * in supporting documentation.  Silicon Graphics makes no
+  47:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * representations about the suitability of this software for any
+  48:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  * purpose.  It is provided "as is" without express or implied warranty.
+  49:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  */
+  50:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  51:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** /** @file bits/stl_pair.h
+  52:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  *  This is an internal header file, included by other library headers.
+  53:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  *  Do not attempt to use it directly. @headername{utility}
+  54:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  */
+  55:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  56:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #ifndef _STL_PAIR_H
+  57:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #define _STL_PAIR_H 1
+  58:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  59:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #include <bits/move.h> // for std::move / std::forward, and std::swap
+  60:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  61:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus >= 201103L
+  62:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** # include <type_traits> // for std::__decay_and_strip, std::is_reference_v
+  63:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+  64:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus > 201703L
+  65:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** # include <compare>
+  66:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** # define __cpp_lib_constexpr_utility 201811L
+  67:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+  68:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  69:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** namespace std _GLIBCXX_VISIBILITY(default)
+  70:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** {
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 12
+
+
+  71:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** _GLIBCXX_BEGIN_NAMESPACE_VERSION
+  72:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  73:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /**
+  74:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @addtogroup utilities
+  75:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @{
+  76:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    */
+  77:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  78:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus >= 201103L
+  79:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// Tag type for piecewise construction of std::pair objects.
+  80:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   struct piecewise_construct_t { explicit piecewise_construct_t() = default; };
+  81:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  82:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// Tag for piecewise construction of std::pair objects.
+  83:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   _GLIBCXX17_INLINE constexpr piecewise_construct_t piecewise_construct =
+  84:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     piecewise_construct_t();
+  85:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  86:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// @cond undocumented
+  87:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  88:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // Forward declarations.
+  89:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename...>
+  90:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     class tuple;
+  91:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  92:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<std::size_t...>
+  93:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     struct _Index_tuple;
+  94:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+  95:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // Concept utility functions, reused in conditionally-explicit
+  96:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // constructors.
+  97:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // See PR 70437, don't look at is_constructible or
+  98:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // is_convertible if the types are the same to
+  99:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // avoid querying those properties for incomplete types.
+ 100:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template <bool, typename _T1, typename _T2>
+ 101:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     struct _PCC
+ 102:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     {
+ 103:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 104:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _ConstructiblePair()
+ 105:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 106:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return __and_<is_constructible<_T1, const _U1&>,
+ 107:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      is_constructible<_T2, const _U2&>>::value;
+ 108:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 109:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 110:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 111:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _ImplicitlyConvertiblePair()
+ 112:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 113:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return __and_<is_convertible<const _U1&, _T1>,
+ 114:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      is_convertible<const _U2&, _T2>>::value;
+ 115:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 116:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 117:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 118:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _MoveConstructiblePair()
+ 119:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 120:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return __and_<is_constructible<_T1, _U1&&>,
+ 121:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      is_constructible<_T2, _U2&&>>::value;
+ 122:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 123:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 124:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 125:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _ImplicitlyMoveConvertiblePair()
+ 126:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 127:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return __and_<is_convertible<_U1&&, _T1>,
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 13
+
+
+ 128:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      is_convertible<_U2&&, _T2>>::value;
+ 129:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 130:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 131:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <bool __implicit, typename _U1, typename _U2>
+ 132:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _CopyMovePair()
+ 133:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 134:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	using __do_converts = __and_<is_convertible<const _U1&, _T1>,
+ 135:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 				  is_convertible<_U2&&, _T2>>;
+ 136:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	using __converts = typename conditional<__implicit,
+ 137:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 				       __do_converts,
+ 138:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 				       __not_<__do_converts>>::type;
+ 139:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return __and_<is_constructible<_T1, const _U1&>,
+ 140:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      is_constructible<_T2, _U2&&>,
+ 141:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      __converts
+ 142:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      >::value;
+ 143:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 144:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 145:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <bool __implicit, typename _U1, typename _U2>
+ 146:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _MoveCopyPair()
+ 147:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 148:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	using __do_converts = __and_<is_convertible<_U1&&, _T1>,
+ 149:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 				  is_convertible<const _U2&, _T2>>;
+ 150:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	using __converts = typename conditional<__implicit,
+ 151:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 				       __do_converts,
+ 152:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 				       __not_<__do_converts>>::type;
+ 153:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return __and_<is_constructible<_T1, _U1&&>,
+ 154:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      is_constructible<_T2, const _U2&&>,
+ 155:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      __converts
+ 156:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      >::value;
+ 157:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 158:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   };
+ 159:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 160:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template <typename _T1, typename _T2>
+ 161:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     struct _PCC<false, _T1, _T2>
+ 162:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     {
+ 163:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 164:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _ConstructiblePair()
+ 165:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 166:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return false;
+ 167:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 168:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 169:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 170:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _ImplicitlyConvertiblePair()
+ 171:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 172:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return false;
+ 173:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 174:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 175:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 176:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _MoveConstructiblePair()
+ 177:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 178:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return false;
+ 179:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 180:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 181:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 182:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       static constexpr bool _ImplicitlyMoveConvertiblePair()
+ 183:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 184:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return false;
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 14
+
+
+ 185:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 186:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   };
+ 187:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif // C++11
+ 188:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 189:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _U1, typename _U2> class __pair_base
+ 190:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   {
+ 191:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus >= 201103L
+ 192:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     template<typename _T1, typename _T2> friend struct pair;
+ 193:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     __pair_base() = default;
+ 194:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     ~__pair_base() = default;
+ 195:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     __pair_base(const __pair_base&) = default;
+ 196:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     __pair_base& operator=(const __pair_base&) = delete;
+ 197:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif // C++11
+ 198:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   };
+ 199:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 200:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// @endcond
+ 201:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 202:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****  /**
+ 203:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @brief Struct holding two objects of arbitrary type.
+ 204:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *
+ 205:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @tparam _T1  Type of first object.
+ 206:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @tparam _T2  Type of second object.
+ 207:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *
+ 208:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  <https://gcc.gnu.org/onlinedocs/libstdc++/manual/utilities.html>
+ 209:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    */
+ 210:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 211:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     struct pair
+ 212:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     : private __pair_base<_T1, _T2>
+ 213:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     {
+ 214:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       typedef _T1 first_type;    ///< The type of the `first` member
+ 215:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       typedef _T2 second_type;   ///< The type of the `second` member
+ 216:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 217:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       _T1 first;                 ///< The first member
+ 218:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       _T2 second;                ///< The second member
+ 219:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 220:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       // _GLIBCXX_RESOLVE_LIB_DEFECTS
+ 221:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       // 265.  std::pair::pair() effects overly restrictive
+ 222:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /** The default constructor creates @c first and @c second using their
+ 223:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        *  respective default constructors.  */
+ 224:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus >= 201103L
+ 225:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1 = _T1,
+ 226:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                 typename _U2 = _T2,
+ 227:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                 typename enable_if<__and_<
+ 228:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                                      __is_implicitly_default_constructible<_U1>,
+ 229:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                                      __is_implicitly_default_constructible<_U2>>
+ 230:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                                    ::value, bool>::type = true>
+ 231:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+ 232:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       _GLIBCXX_CONSTEXPR pair()
+ 233:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       : first(), second() { }
+ 234:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 235:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus >= 201103L
+ 236:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1 = _T1,
+ 237:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                 typename _U2 = _T2,
+ 238:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                 typename enable_if<__and_<
+ 239:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                        is_default_constructible<_U1>,
+ 240:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                        is_default_constructible<_U2>,
+ 241:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                        __not_<
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 15
+
+
+ 242:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          __and_<__is_implicitly_default_constructible<_U1>,
+ 243:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                                 __is_implicitly_default_constructible<_U2>>>>
+ 244:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                                    ::value, bool>::type = false>
+ 245:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       explicit constexpr pair()
+ 246:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       : first(), second() { }
+ 247:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+ 248:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 249:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus < 201103L
+ 250:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// Two objects may be passed to a @c pair constructor to be copied.
+ 251:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       pair(const _T1& __a, const _T2& __b)
+ 252:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       : first(__a), second(__b) { }
+ 253:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #else
+ 254:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       // Shortcut for constraining the templates that don't take pairs.
+ 255:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// @cond undocumented
+ 256:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       using _PCCP = _PCC<true, _T1, _T2>;
+ 257:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// @endcond
+ 258:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 259:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// Construct from two const lvalues, allowing implicit conversions.
+ 260:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1 = _T1, typename _U2=_T2, typename
+ 261:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCP::template
+ 262:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ConstructiblePair<_U1, _U2>()
+ 263:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	                 && _PCCP::template
+ 264:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ImplicitlyConvertiblePair<_U1, _U2>(),
+ 265:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=true>
+ 266:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       constexpr pair(const _T1& __a, const _T2& __b)
+ 267:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       : first(__a), second(__b) { }
+ 268:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 269:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// Construct from two const lvalues, disallowing implicit conversions.
+ 270:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        template<typename _U1 = _T1, typename _U2=_T2, typename
+ 271:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		enable_if<_PCCP::template
+ 272:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			    _ConstructiblePair<_U1, _U2>()
+ 273:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	                  && !_PCCP::template
+ 274:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			    _ImplicitlyConvertiblePair<_U1, _U2>(),
+ 275:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=false>
+ 276:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       explicit constexpr pair(const _T1& __a, const _T2& __b)
+ 277:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       : first(__a), second(__b) { }
+ 278:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+ 279:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 280:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus < 201103L
+ 281:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// There is also a templated constructor to convert from other pairs.
+ 282:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2>
+ 283:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	pair(const pair<_U1, _U2>& __p)
+ 284:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	: first(__p.first), second(__p.second) { }
+ 285:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #else
+ 286:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       // Shortcut for constraining the templates that take pairs.
+ 287:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// @cond undocumented
+ 288:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template <typename _U1, typename _U2>
+ 289:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****         using _PCCFP = _PCC<!is_same<_T1, _U1>::value
+ 290:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			    || !is_same<_T2, _U2>::value,
+ 291:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			    _T1, _T2>;
+ 292:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// @endcond
+ 293:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 294:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2, typename
+ 295:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCFP<_U1, _U2>::template
+ 296:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ConstructiblePair<_U1, _U2>()
+ 297:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	                 && _PCCFP<_U1, _U2>::template
+ 298:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ImplicitlyConvertiblePair<_U1, _U2>(),
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 16
+
+
+ 299:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			  bool>::type=true>
+ 300:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****         constexpr pair(const pair<_U1, _U2>& __p)
+ 301:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****         : first(__p.first), second(__p.second) { }
+ 302:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 303:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2, typename
+ 304:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCFP<_U1, _U2>::template
+ 305:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ConstructiblePair<_U1, _U2>()
+ 306:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			 && !_PCCFP<_U1, _U2>::template
+ 307:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ImplicitlyConvertiblePair<_U1, _U2>(),
+ 308:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=false>
+ 309:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	explicit constexpr pair(const pair<_U1, _U2>& __p)
+ 310:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	: first(__p.first), second(__p.second) { }
+ 311:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+ 312:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 313:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus >= 201103L
+ 314:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       constexpr pair(const pair&) = default;	///< Copy constructor
+ 315:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       constexpr pair(pair&&) = default;		///< Move constructor
+ 316:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 317:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       // DR 811.
+ 318:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename
+ 319:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCP::template
+ 320:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _MoveCopyPair<true, _U1, _T2>(),
+ 321:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=true>
+ 322:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        constexpr pair(_U1&& __x, const _T2& __y)
+ 323:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        : first(std::forward<_U1>(__x)), second(__y) { }
+ 324:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 325:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename
+ 326:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCP::template
+ 327:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _MoveCopyPair<false, _U1, _T2>(),
+ 328:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=false>
+ 329:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        explicit constexpr pair(_U1&& __x, const _T2& __y)
+ 330:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        : first(std::forward<_U1>(__x)), second(__y) { }
+ 331:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 332:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U2, typename
+ 333:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCP::template
+ 334:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _CopyMovePair<true, _T1, _U2>(),
+ 335:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=true>
+ 336:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        constexpr pair(const _T1& __x, _U2&& __y)
+ 337:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        : first(__x), second(std::forward<_U2>(__y)) { }
+ 338:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 339:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U2, typename
+ 340:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCP::template
+ 341:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _CopyMovePair<false, _T1, _U2>(),
+ 342:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=false>
+ 343:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        explicit pair(const _T1& __x, _U2&& __y)
+ 344:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****        : first(__x), second(std::forward<_U2>(__y)) { }
+ 345:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 346:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2, typename
+ 347:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCP::template
+ 348:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _MoveConstructiblePair<_U1, _U2>()
+ 349:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			  && _PCCP::template
+ 350:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ImplicitlyMoveConvertiblePair<_U1, _U2>(),
+ 351:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=true>
+ 352:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	constexpr pair(_U1&& __x, _U2&& __y)
+ 353:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	: first(std::forward<_U1>(__x)), second(std::forward<_U2>(__y)) { }
+ 354:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 355:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2, typename
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 17
+
+
+ 356:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCP::template
+ 357:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _MoveConstructiblePair<_U1, _U2>()
+ 358:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			  && !_PCCP::template
+ 359:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ImplicitlyMoveConvertiblePair<_U1, _U2>(),
+ 360:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=false>
+ 361:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	explicit constexpr pair(_U1&& __x, _U2&& __y)
+ 362:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	: first(std::forward<_U1>(__x)), second(std::forward<_U2>(__y)) { }
+ 363:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 364:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 365:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2, typename
+ 366:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCFP<_U1, _U2>::template
+ 367:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _MoveConstructiblePair<_U1, _U2>()
+ 368:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			  && _PCCFP<_U1, _U2>::template
+ 369:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ImplicitlyMoveConvertiblePair<_U1, _U2>(),
+ 370:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=true>
+ 371:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	constexpr pair(pair<_U1, _U2>&& __p)
+ 372:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	: first(std::forward<_U1>(__p.first)),
+ 373:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	  second(std::forward<_U2>(__p.second)) { }
+ 374:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 375:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2, typename
+ 376:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	       enable_if<_PCCFP<_U1, _U2>::template
+ 377:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _MoveConstructiblePair<_U1, _U2>()
+ 378:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			  && !_PCCFP<_U1, _U2>::template
+ 379:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   _ImplicitlyMoveConvertiblePair<_U1, _U2>(),
+ 380:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                          bool>::type=false>
+ 381:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	explicit constexpr pair(pair<_U1, _U2>&& __p)
+ 382:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	: first(std::forward<_U1>(__p.first)),
+ 383:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	  second(std::forward<_U2>(__p.second)) { }
+ 384:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 385:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename... _Args1, typename... _Args2>
+ 386:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	_GLIBCXX20_CONSTEXPR
+ 387:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****         pair(piecewise_construct_t, tuple<_Args1...>, tuple<_Args2...>);
+ 388:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 389:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       _GLIBCXX20_CONSTEXPR pair&
+ 390:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       operator=(typename conditional<
+ 391:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		__and_<is_copy_assignable<_T1>,
+ 392:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		       is_copy_assignable<_T2>>::value,
+ 393:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		const pair&, const __nonesuch&>::type __p)
+ 394:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 395:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	first = __p.first;
+ 396:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	second = __p.second;
+ 397:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return *this;
+ 398:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 399:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 400:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       _GLIBCXX20_CONSTEXPR pair&
+ 401:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       operator=(typename conditional<
+ 402:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		__and_<is_move_assignable<_T1>,
+ 403:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		       is_move_assignable<_T2>>::value,
+ 404:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		pair&&, __nonesuch&&>::type __p)
+ 405:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       noexcept(__and_<is_nothrow_move_assignable<_T1>,
+ 406:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 		      is_nothrow_move_assignable<_T2>>::value)
+ 407:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 408:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	first = std::forward<first_type>(__p.first);
+ 409:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	second = std::forward<second_type>(__p.second);
+ 410:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return *this;
+ 411:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 412:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 18
+
+
+ 413:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2>
+ 414:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	_GLIBCXX20_CONSTEXPR
+ 415:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	typename enable_if<__and_<is_assignable<_T1&, const _U1&>,
+ 416:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 				  is_assignable<_T2&, const _U2&>>::value,
+ 417:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   pair&>::type
+ 418:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	operator=(const pair<_U1, _U2>& __p)
+ 419:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	{
+ 420:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	  first = __p.first;
+ 421:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	  second = __p.second;
+ 422:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	  return *this;
+ 423:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	}
+ 424:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 425:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename _U1, typename _U2>
+ 426:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	_GLIBCXX20_CONSTEXPR
+ 427:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	typename enable_if<__and_<is_assignable<_T1&, _U1&&>,
+ 428:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 				  is_assignable<_T2&, _U2&&>>::value,
+ 429:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			   pair&>::type
+ 430:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	operator=(pair<_U1, _U2>&& __p)
+ 431:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	{
+ 432:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	  first = std::forward<_U1>(__p.first);
+ 433:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	  second = std::forward<_U2>(__p.second);
+ 434:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	  return *this;
+ 435:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	}
+ 436:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 437:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       /// Swap the first members and then the second members.
+ 438:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       _GLIBCXX20_CONSTEXPR void
+ 439:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       swap(pair& __p)
+ 440:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       noexcept(__and_<__is_nothrow_swappable<_T1>,
+ 441:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                       __is_nothrow_swappable<_T2>>::value)
+ 442:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       {
+ 443:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	using std::swap;
+ 444:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	swap(first, __p.first);
+ 445:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	swap(second, __p.second);
+ 446:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       }
+ 447:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 448:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     private:
+ 449:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       template<typename... _Args1, std::size_t... _Indexes1,
+ 450:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                typename... _Args2, std::size_t... _Indexes2>
+ 451:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	_GLIBCXX20_CONSTEXPR
+ 452:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****         pair(tuple<_Args1...>&, tuple<_Args2...>&,
+ 453:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****              _Index_tuple<_Indexes1...>, _Index_tuple<_Indexes2...>);
+ 454:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif // C++11
+ 455:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     };
+ 456:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 457:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// @relates pair @{
+ 458:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 459:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cpp_deduction_guides >= 201606
+ 460:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2> pair(_T1, _T2) -> pair<_T1, _T2>;
+ 461:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+ 462:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 463:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// Two pairs of the same type are equal iff their members are equal.
+ 464:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 465:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     inline _GLIBCXX_CONSTEXPR bool
+ 466:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     operator==(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+ 467:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     { return __x.first == __y.first && __x.second == __y.second; }
+ 468:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 469:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cpp_lib_three_way_comparison && __cpp_lib_concepts
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 19
+
+
+ 470:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 471:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     constexpr common_comparison_category_t<__detail::__synth3way_t<_T1>,
+ 472:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 					   __detail::__synth3way_t<_T2>>
+ 473:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     operator<=>(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+ 474:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     {
+ 475:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       if (auto __c = __detail::__synth3way(__x.first, __y.first); __c != 0)
+ 476:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	return __c;
+ 477:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****       return __detail::__synth3way(__x.second, __y.second);
+ 478:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     }
+ 479:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #else
+ 480:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /** Defines a lexicographical order for pairs.
+ 481:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *
+ 482:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    * For two pairs of the same type, `P` is ordered before `Q` if
+ 483:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    * `P.first` is less than `Q.first`, or if `P.first` and `Q.first`
+ 484:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    * are equivalent (neither is less than the other) and `P.second` is less
+ 485:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    * than `Q.second`.
+ 486:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   */
+ 487:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 488:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     inline _GLIBCXX_CONSTEXPR bool
+ 489:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     operator<(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+ 490:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     { return __x.first < __y.first
+ 491:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	     || (!(__y.first < __x.first) && __x.second < __y.second); }
+ 492:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 493:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// Uses @c operator== to find the result.
+ 494:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 495:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     inline _GLIBCXX_CONSTEXPR bool
+ 496:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     operator!=(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+ 497:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     { return !(__x == __y); }
+ 498:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 499:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// Uses @c operator< to find the result.
+ 500:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 501:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     inline _GLIBCXX_CONSTEXPR bool
+ 502:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     operator>(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+ 503:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     { return __y < __x; }
+ 504:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 505:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// Uses @c operator< to find the result.
+ 506:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 507:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     inline _GLIBCXX_CONSTEXPR bool
+ 508:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     operator<=(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+ 509:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     { return !(__y < __x); }
+ 510:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 511:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// Uses @c operator< to find the result.
+ 512:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 513:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     inline _GLIBCXX_CONSTEXPR bool
+ 514:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     operator>=(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+ 515:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     { return !(__x < __y); }
+ 516:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif // !(three_way_comparison && concepts)
+ 517:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 518:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus >= 201103L
+ 519:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /** Swap overload for pairs. Calls std::pair::swap().
+ 520:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *
+ 521:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    * @note This std::swap overload is not declared in C++03 mode,
+ 522:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    * which has performance implications, e.g. see https://gcc.gnu.org/PR38466
+ 523:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   */
+ 524:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 525:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     _GLIBCXX20_CONSTEXPR inline
+ 526:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus > 201402L || !defined(__STRICT_ANSI__) // c++1z or gnu++11
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 20
+
+
+ 527:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     // Constrained free swap overload, see p0185r1
+ 528:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     typename enable_if<__and_<__is_swappable<_T1>,
+ 529:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                               __is_swappable<_T2>>::value>::type
+ 530:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #else
+ 531:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     void
+ 532:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+ 533:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     swap(pair<_T1, _T2>& __x, pair<_T1, _T2>& __y)
+ 534:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     noexcept(noexcept(__x.swap(__y)))
+ 535:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     { __x.swap(__y); }
+ 536:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 537:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus > 201402L || !defined(__STRICT_ANSI__) // c++1z or gnu++11
+ 538:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 539:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     typename enable_if<!__and_<__is_swappable<_T1>,
+ 540:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 			       __is_swappable<_T2>>::value>::type
+ 541:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     swap(pair<_T1, _T2>&, pair<_T1, _T2>&) = delete;
+ 542:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif
+ 543:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #endif // __cplusplus >= 201103L
+ 544:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 545:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /// @} relates pair
+ 546:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 547:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   /**
+ 548:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @brief A convenience wrapper for creating a pair from two objects.
+ 549:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @param  __x  The first object.
+ 550:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @param  __y  The second object.
+ 551:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  @return   A newly-constructed pair<> object of the appropriate type.
+ 552:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *
+ 553:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  The C++98 standard says the objects are passed by reference-to-const,
+ 554:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  but C++03 says they are passed by value (this was LWG issue #181).
+ 555:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *
+ 556:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  Since C++11 they have been passed by forwarding reference and then
+ 557:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  forwarded to the new members of the pair. To create a pair with a
+ 558:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    *  member of reference type, pass a `reference_wrapper` to this function.
+ 559:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****    */
+ 560:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // _GLIBCXX_RESOLVE_LIB_DEFECTS
+ 561:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // 181.  make_pair() unintended behavior
+ 562:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** #if __cplusplus >= 201103L
+ 563:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   // NB: DR 706.
+ 564:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****   template<typename _T1, typename _T2>
+ 565:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     constexpr pair<typename __decay_and_strip<_T1>::__type,
+ 566:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****                    typename __decay_and_strip<_T2>::__type>
+ 567:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h ****     make_pair(_T1&& __x, _T2&& __y)
+ 173              		.loc 4 567 5 view .LVU50
+ 174              	.LBB58:
+ 175              	.LBB59:
+ 176              	.LBI59:
+ 352:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	: first(std::forward<_U1>(__x)), second(std::forward<_U2>(__y)) { }
+ 177              		.loc 4 352 12 view .LVU51
+ 178              	.LBB60:
+ 179              	.LBI60:
+ 352:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 	: first(std::forward<_U1>(__x)), second(std::forward<_U2>(__y)) { }
+ 180              		.loc 4 352 12 view .LVU52
+ 181              	.LBB61:
+ 182              	.LBB62:
+ 183              	.LBI62:
+ 184              		.file 5 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h"
+   1:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // Move, forward and identity for C++11 + swap -*- C++ -*-
+   2:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 21
+
+
+   3:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // Copyright (C) 2007-2020 Free Software Foundation, Inc.
+   4:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** //
+   5:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // This file is part of the GNU ISO C++ Library.  This library is free
+   6:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // software; you can redistribute it and/or modify it under the
+   7:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // terms of the GNU General Public License as published by the
+   8:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // Free Software Foundation; either version 3, or (at your option)
+   9:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // any later version.
+  10:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  11:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // This library is distributed in the hope that it will be useful,
+  12:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // GNU General Public License for more details.
+  15:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  16:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // Under Section 7 of GPL version 3, you are granted additional
+  17:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // permissions described in the GCC Runtime Library Exception, version
+  18:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // 3.1, as published by the Free Software Foundation.
+  19:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  20:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // You should have received a copy of the GNU General Public License and
+  21:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // a copy of the GCC Runtime Library Exception along with this program;
+  22:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+  23:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** // <http://www.gnu.org/licenses/>.
+  24:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  25:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** /** @file bits/move.h
+  26:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****  *  This is an internal header file, included by other library headers.
+  27:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****  *  Do not attempt to use it directly. @headername{utility}
+  28:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****  */
+  29:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  30:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** #ifndef _MOVE_H
+  31:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** #define _MOVE_H 1
+  32:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  33:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** #include <bits/c++config.h>
+  34:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** #if __cplusplus < 201103L
+  35:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** # include <bits/concept_check.h>
+  36:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** #endif
+  37:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  38:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** namespace std _GLIBCXX_VISIBILITY(default)
+  39:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** {
+  40:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** _GLIBCXX_BEGIN_NAMESPACE_VERSION
+  41:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  42:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****   // Used, in C++03 mode too, by allocators, etc.
+  43:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****   /**
+  44:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    *  @brief Same as C++11 std::addressof
+  45:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    *  @ingroup utilities
+  46:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    */
+  47:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****   template<typename _Tp>
+  48:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****     inline _GLIBCXX_CONSTEXPR _Tp*
+  49:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****     __addressof(_Tp& __r) _GLIBCXX_NOEXCEPT
+  50:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****     { return __builtin_addressof(__r); }
+  51:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  52:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** #if __cplusplus >= 201103L
+  53:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  54:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** _GLIBCXX_END_NAMESPACE_VERSION
+  55:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** } // namespace
+  56:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  57:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** #include <type_traits> // Brings in std::declval too.
+  58:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  59:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** namespace std _GLIBCXX_VISIBILITY(default)
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 22
+
+
+  60:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** {
+  61:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** _GLIBCXX_BEGIN_NAMESPACE_VERSION
+  62:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  63:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****   /**
+  64:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    *  @addtogroup utilities
+  65:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    *  @{
+  66:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    */
+  67:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h **** 
+  68:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****   /**
+  69:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    *  @brief  Forward an lvalue.
+  70:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    *  @return The parameter cast to the specified type.
+  71:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    *
+  72:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    *  This function is used to implement "perfect forwarding".
+  73:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****    */
+  74:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****   template<typename _Tp>
+  75:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****     constexpr _Tp&&
+  76:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/move.h ****     forward(typename std::remove_reference<_Tp>::type& __t) noexcept
+ 185              		.loc 5 76 5 view .LVU53
+ 186              		.loc 5 76 5 is_stmt 0 view .LVU54
+ 187              	.LBE62:
+ 188              	.LBE61:
+ 189              	.LBE60:
+ 190              	.LBE59:
+ 191              	.LBE58:
+ 192              	.LBE57:
+  26:src/quantizer.cpp ****     float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
+ 193              		.loc 1 26 29 view .LVU55
+ 194 0074 07EE904A 		vmov	s15, r4	@ int
+  26:src/quantizer.cpp ****     float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
+ 195              		.loc 1 26 11 view .LVU56
+ 196 0078 B2EE087A 		vmov.f32	s14, #1.2e+1
+ 197              	.LVL15:
+ 198              	.LBB72:
+ 199              	.LBB70:
+ 200              	.LBB68:
+ 201              	.LBB66:
+ 202              	.LBB64:
+ 353:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 203              		.loc 4 353 64 view .LVU57
+ 204 007c 4460     		str	r4, [r0, #4]
+ 205              	.LBE64:
+ 206              	.LBE66:
+ 207              	.LBE68:
+ 208              	.LBE70:
+ 209              	.LBE72:
+  26:src/quantizer.cpp ****     float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
+ 210              		.loc 1 26 29 view .LVU58
+ 211 007e F8EEE76A 		vcvt.f32.s32	s13, s15
+ 212              	.LVL16:
+  26:src/quantizer.cpp ****     float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
+ 213              		.loc 1 26 11 view .LVU59
+ 214 0082 C6EE877A 		vdiv.f32	s15, s13, s14
+ 215              	.LVL17:
+  27:src/quantizer.cpp ****     return std::make_pair(targetNoteVoltage, nearestScaleToneIndex);
+ 216              		.loc 1 27 37 view .LVU60
+ 217 0086 77EE857A 		vadd.f32	s15, s15, s10
+ 218              	.LVL18:
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 23
+
+
+  27:src/quantizer.cpp ****     return std::make_pair(targetNoteVoltage, nearestScaleToneIndex);
+ 219              		.loc 1 27 55 view .LVU61
+ 220 008a 77EEA57A 		vadd.f32	s15, s15, s11
+ 221              	.LVL19:
+ 222              	.LBB73:
+ 223              	.LBB71:
+ 224              	.LBB69:
+ 225              	.LBB67:
+ 226              	.LBB65:
+ 353:/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_pair.h **** 
+ 227              		.loc 4 353 64 view .LVU62
+ 228 008e C0ED007A 		vstr.32	s15, [r0]
+ 229              	.LVL20:
+ 230              	.LBB63:
+ 231              	.LBI63:
+ 232              		.loc 5 76 5 is_stmt 1 view .LVU63
+ 233              		.loc 5 76 5 is_stmt 0 view .LVU64
+ 234              	.LBE63:
+ 235              	.LBE65:
+ 236              	.LBE67:
+ 237              	.LBE69:
+ 238              	.LBE71:
+ 239              	.LBE73:
+  29:src/quantizer.cpp **** }...
+ 240              		.loc 1 29 1 view .LVU65
+ 241 0092 30BD     		pop	{r4, r5, pc}
+ 242              		.loc 1 29 1 view .LVU66
+ 243              		.cfi_endproc
+ 244              	.LFE1977:
+ 246              		.text
+ 247              	.Letext0:
+ 248              		.file 6 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/machine/_default_types.h"
+ 249              		.file 7 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/sys/_stdint.h"
+ 250              		.file 8 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/stdint.h"
+ 251              		.file 9 "/Library/DaisyToolchain/0.2.0/arm/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 252              		.file 10 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v
+ 253              		.file 11 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/type_traits"
+ 254              		.file 12 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/debug/debug.h"
+ 255              		.file 13 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cwchar"
+ 256              		.file 14 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cstdint"
+ 257              		.file 15 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/exception_ptr.h"
+ 258              		.file 16 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/clocale"
+ 259              		.file 17 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cstdlib"
+ 260              		.file 18 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cstdio"
+ 261              		.file 19 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/basic_string.h"
+ 262              		.file 20 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/array"
+ 263              		.file 21 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/predefined_ops.h
+ 264              		.file 22 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/sys/_types.h"
+ 265              		.file 23 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/sys/reent.h"
+ 266              		.file 24 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/sys/lock.h"
+ 267              		.file 25 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/math.h"
+ 268              		.file 26 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/stdlib.h"
+ 269              		.file 27 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/math.h"
+ 270              		.file 28 "/Library/DaisyToolchain/0.2.0/arm/lib/gcc/arm-none-eabi/10.3.1/include/stdarg.h"
+ 271              		.file 29 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/wchar.h"
+ 272              		.file 30 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/locale.h"
+ 273              		.file 31 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/stdio.h"
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 24
+
+
+ 274              		.file 32 "<built-in>"
+ARM GAS  /var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s 			page 25
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 quantizer.cpp
+/var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s:19     .text._Z15quantizeToScaleRKfS0_RKSt5arrayIfLj12EES0_:0000000000000000 $t
+/var/folders/cl/r97w26fn2f10y5b55m18gt9w0000gn/T//ccI76SNr.s:25     .text._Z15quantizeToScaleRKfS0_RKSt5arrayIfLj12EES0_:0000000000000000 _Z15quantizeToScaleRKfS0_RKSt5arrayIfLj12EES0_
+
+NO UNDEFINED SYMBOLS
