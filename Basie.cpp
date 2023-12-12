@@ -2,6 +2,8 @@
 #include "daisy_patch.h"
 #include <string>
 #include <array>
+#include "src/theory.hpp"
+#include "src/quantizer.hpp"
 
 #include "fatfs.h"
 
@@ -22,7 +24,6 @@ static DaisyPatch hw;
 SdmmcHandler   sd;
 FatFSInterface fsi;
 
-
 DIR dir;
 FILINFO fno;
 
@@ -33,10 +34,13 @@ UINT br;        // Read count
 std::vector<std::string> fileList;
 int fileListCursor = 0;
 int loadedFileIndex = 0;
+int fileListPageIndex = 0;
 
 int displayTabIndex = 0;
 bool encoderIsHeld = false;
 bool tabChangeInProcess = false;
+
+bool beatChanging = false;
 
 string errorMessage = "Test message";
 
@@ -57,9 +61,27 @@ int playhead = 0;
 
 int chordType = 0;
 
-
 // ----------------- //
 
+void MIDISendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
+    uint8_t data[3] = { 0 };
+    
+    data[0] = (channel & 0x0F) + 0x90;  // limit channel byte, add status byte
+    data[1] = note & 0x7F;              // remove MSB on data
+    data[2] = velocity & 0x7F;
+
+    patch.midi.SendMessage(data, 3);
+};
+
+void MIDISendNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
+    uint8_t data[3] = { 0 };
+
+    data[0] = (channel & 0x0F) + 0x80;  // limit channel byte, add status byte
+    data[1] = note & 0x7F;              // remove MSB on data
+    data[2] = velocity & 0x7F;
+
+    patch.midi.SendMessage(data, 3);
+}
 
 std::vector<std::string> listTxtFiles(const char* path) {
 
@@ -148,94 +170,6 @@ void UpdateOled();
 void UpdateOutputs();
 void Process();
 
-// ----------------- //
-// Theory setup
-// ----------------- //
-
-// Define chords as half steps above root
-struct Chord
-{
-    array<int, 7> tones;
-    string displayName;
-    array<float, 12> chordScale;
-    Chord(array<int, 7> tones, string displayName, array<float, 12> chordScale)
-    {
-        this->tones = tones;
-        this->displayName = displayName;
-        this->chordScale = chordScale;
-    }
-    ~Chord()
-    {
-    }
-};
-
-array<float, 12> ionianScale = {1, 0, 0.1, 0, 0.5, 0.3, 0, 0.7, 0, 0.3, 0, 0.5};
-array<float, 12> dorianScale = {1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0};
-array<float, 12> phrygianScale = {1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0};
-array<float, 12> lydianScale = {1, 0, 0.1, 0, 0.5, 0, 0.7, 0.7, 0, 0.3, 0, 0.6};
-array<float, 12> lydianDominantScale = {1, 0, 0.1, 0, 0.5, 0, 0.7, 0.7, 0, 0.3, 0.6, 0};
-array<float, 12> mixolydianScale = {1, 0, 0.1, 0, 0.5, 0.3, 0, 0.7, 0, 0.3, 0.5, 0};
-array<float, 12> mixolydianFlat2Scale = {1, 0.7, 0, 0, 0.5, 0.2, 0, 0.7, 0, 0.2, 0.6, 0};
-array<float, 12> mixolydianFlat13Scale = {1, 0, 0.1, 0, 0.5, 1, 0, 0.8, 0.7, 0, 0.6, 0};
-array<float, 12> aeoleanScale = {1, 0, 0.1, 0.5, 0, 0.3, 0, 0.7, 0, 0.3, 0, 0.5};
-array<float, 12> locrianScale = {1, 0.1, 0, 0.5, 0, 0.3, 0.7, 0, 0.3, 0, 0.5, 0};
-array<float, 12> diminishedScale = {1, 0, 0.6, 0.8, 0, 0.6, 0.8, 0, 0.6, 0.8, 0, 0.6};
-array<float, 12> alteredScale = {1, 0.3, 0, 0.5, 0.1, 0, 0.8, 0, 0.4, 0, 0.6, 0};
-array<float, 12> augmentedScale = {1, 0, 0.2, 0, 0.5, 0, 0, 0.2, 0.8, 0, 0, 0.2};
-
-// TODO not actually sure 13 is relevant for lots of these
-// TODO more than one scale per chord
-Chord *majorChord = new Chord({0, 4, 7, 11, 14, 17, 21}, "maj7", ionianScale);
-Chord *minorChord = new Chord({0, 3, 7, 10, 14, 17, 21}, "min7", aeoleanScale);
-Chord *major6Chord = new Chord({0, 4, 7, 9, 14, 17, 21}, "6", ionianScale);
-Chord *minor6Chord = new Chord({0, 3, 7, 9, 14, 17, 21}, "min6", dorianScale);
-Chord *dominantChord = new Chord({0, 4, 7, 10, 14, 17, 21}, "7", mixolydianScale);
-Chord *halfDiminishedChord = new Chord({0, 3, 6, 10, 14, 17, 21}, "halfdim7", locrianScale);
-Chord *diminishedChord = new Chord({0, 3, 6, 9, 12, 15, 21}, "dim7", diminishedScale);
-Chord *flat9chord = new Chord({0, 4, 7, 10, 13, 17, 21}, "7b9", mixolydianFlat2Scale);
-Chord *sharp9chord = new Chord({0, 4, 7, 10, 15, 17, 21}, "7#9", alteredScale);
-Chord *sharp11chord = new Chord({0, 4, 7, 11, 14, 18, 21}, "maj7#11", lydianScale);
-Chord *dominantSharp11chord = new Chord({0, 4, 7, 10, 14, 18, 21}, "7#11", lydianDominantScale);
-Chord *flat13chord = new Chord({0, 4, 7, 10, 14, 17, 20}, "7b13", mixolydianFlat13Scale);
-Chord *augmentedChord = new Chord({0, 4, 8, 10, 14, 17, 21}, "aug", augmentedScale);
-
-// TODO OOPS DOESN'T WORK W SHARPS :(
-array<string, 12> noteDisplayNames = {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
-
-array<Chord *, 14> chordList = {majorChord, minorChord, major6Chord, minor6Chord, dominantChord, halfDiminishedChord, diminishedChord, flat9chord, sharp9chord, sharp11chord, dominantSharp11chord, flat13chord, augmentedChord };
-
-struct ChordScale
-{
-    std::array<int, 12> tones;
-};
-
-std::pair<float, int> quantizeToScale(const float& noteInVoltage, const float& chordRootOffsetVoltage, const array<float, 12>& targetScale, const float& jazzAmount)
-{
-    float whole, fractional;
-    float jazzThreshold = 1.0 - jazzAmount;
-    whole = floor(noteInVoltage);
-    fractional = noteInVoltage - whole;
-    int nearestScaleToneIndex;
-    float currentLowestNoteDistance = 1.0;
-    for (int i = 0; i < 12; i++) {
-        if ((float)targetScale[i] >= jazzThreshold) {
-            float indexAsFloat = (float)i;
-            float indexAsVoltage = (indexAsFloat/12) + chordRootOffsetVoltage;
-            if (indexAsVoltage > 1.0) {
-                indexAsVoltage = indexAsVoltage - 1;
-            }
-            float noteDistance = abs(indexAsVoltage - fractional);
-            if (noteDistance < currentLowestNoteDistance) {
-                currentLowestNoteDistance = noteDistance;
-                nearestScaleToneIndex = i;
-            }
-        }
-    }
-    float baseNoteVoltage = (float)nearestScaleToneIndex / 12;
-    float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
-    return std::make_pair(targetNoteVoltage, nearestScaleToneIndex);
-}
-
 // Helper function to trim whitespace from the start and end of a string
 std::string trim(const std::string& str) {
     size_t first = str.find_first_not_of(" \n\r\t\f\v");
@@ -310,7 +244,6 @@ void ProcessEncoder()
         encoderIsHeld = false;
         if (!tabChangeInProcess && displayTabIndex == 1) {
             loadSong(fileList[fileListCursor]);
-            // TODO ew, abstract this
             loadedFileIndex = fileListCursor;
         }
         tabChangeInProcess = false;
@@ -319,11 +252,12 @@ void ProcessEncoder()
     if (increment != 0)
     {
         if (encoderIsHeld) {
+            // Change tab
             displayTabIndex++;
             displayTabIndex = displayTabIndex % 2;
             tabChangeInProcess = true;
         } else {
-            // navigate file system
+            // Navigate file system
             int fileListSize = static_cast<int>(fileList.size());
             fileListCursor += increment;
 
@@ -353,6 +287,7 @@ void Process()
     
     if (patch.gate_input[0].Trig())
     {
+        beatChanging = true;
         int songLength = currentSongChords.size();
         playhead = (playhead + 1) % songLength;
     }
@@ -383,7 +318,7 @@ void Process()
     chordType = chordTypeBuffer;
 
     // Migration TODO: Unused
-    float chordVoltages[7];
+    // float chordVoltages[7];
     array<float, 12> targetScale;
 
     int chordRootIndex = 0;
@@ -394,7 +329,7 @@ void Process()
         }
     }
 
-    targetChord = majorChord;
+    targetChord = chordList[0]; // initialize with default
     for (std::size_t i = 0; i < chordList.size(); i++) {
         if (chordList[i]->displayName == chordType) {
             targetChord = chordList[i];
@@ -415,7 +350,7 @@ void Process()
 
     for (int i = 0; i < chordToneCount; i++)
     {   
-        int chordTone = targetChord->tones[i];
+        // int chordTone = targetChord->tones[i];
         // TODO Abstract this
         // Migration TODO: Reimplement voicing type
         // Migration TODO: UI
@@ -431,9 +366,9 @@ void Process()
             // setRGBBrightness(chordLights[targetLightIndex], 1.0, 1.0, 1.0);
         }
 
-        float chordToneAsFloat = (float)chordTone;
-        float noteVoltage = (chordToneAsFloat / 12.0) + chordRootOffsetVoltage;
-        chordVoltages[i] = noteVoltage;
+        // float chordToneAsFloat = (float)chordTone;
+        // float noteVoltage = (chordToneAsFloat / 12.0) + chordRootOffsetVoltage;
+        // chordVoltages[i] = noteVoltage;
     }
 
     // Write the chord tones to output
@@ -446,6 +381,12 @@ void Process()
     // outputs[CV_OUTPUT_5].setVoltage(chordVoltages[4]);
     // outputs[CV_OUTPUT_6].setVoltage(chordVoltages[5]);
     // outputs[CV_OUTPUT_7].setVoltage(chordVoltages[6]);
+
+    if (beatChanging == true)
+    {
+        MIDISendNoteOff(0, 40, 100);
+        MIDISendNoteOn(0, 40, 100);
+    }
 
     // Update the display with human names for the current chord
     chordDisplay = noteDisplayNames[chordRootIndex] + targetChord->displayName;
@@ -501,6 +442,8 @@ void Process()
     patch.seed.dac.WriteValue(DacHandle::Channel::TWO,
                               note2QuantizedVoltage * 819.2f);
 
+    beatChanging = false;
+
 }
 
 
@@ -522,26 +465,28 @@ void UpdateOled()
         patch.display.SetCursor(0, 20);
         str = displayLineThree;
         patch.display.WriteString(cstr, Font_7x10, true);
-    } else if (displayTabIndex == 1)
-    {
-        std::string str = "File browser";
-        char*       cstr = &str[0];
-
+    } else if (displayTabIndex == 1) {
+        std::string headerStr = "File browser";
         patch.display.SetCursor(0, 0);
-        patch.display.WriteString(cstr, Font_7x10, true);
+        patch.display.WriteString(headerStr.c_str(), Font_7x10, true);
 
-        patch.display.SetCursor(0, 10);
-        str = errorMessage;
-        patch.display.WriteString(cstr, Font_7x10, true);
+        int filesPerPage = 5;
+        fileListPageIndex = (int)fileListCursor / filesPerPage ;
+        int lowerPageBound = fileListPageIndex * filesPerPage ;
+        int fileListLength = static_cast<int>(fileList.size());
 
-        for (std::size_t i = 0; i < fileList.size(); i++ ) {
-            patch.display.SetCursor(0, (i + 1)*10);
-            string str;
-            fileListCursor == i ? str += ">" : str += " ";
-            loadedFileIndex == i ? str += "*" : str += " ";
-            str += fileList[i];
-            char* cstr = &str[0];
-            patch.display.WriteString(cstr, Font_7x10, true);
+        int upperPageBound = (fileListPageIndex + 1) * filesPerPage;
+        if (upperPageBound > fileListLength) {
+            upperPageBound = fileListLength;
+        }
+
+        for (int i = lowerPageBound; i < upperPageBound; i++ ) {
+            patch.display.SetCursor(0, (i + 1 - (filesPerPage * fileListPageIndex)) * 10);
+            std::string fileStr;
+            fileListCursor == i ? fileStr += ">" : fileStr += " ";
+            loadedFileIndex == i ? fileStr += "*" : fileStr += " ";
+            fileStr += fileList[i];
+            patch.display.WriteString(fileStr.c_str(), Font_7x10, true);
         }
     }
 
@@ -551,19 +496,5 @@ void UpdateOled()
 void UpdateOutputs()
 {
 }
-
-
-// Eng TODOs
-// Handle empty SD card
-// Handle file list changing
-// Actually init properly when loading files
-// Only init SD card once
-// Reset index on restart
-
-// Product
-// 2 jazz params
-// Support more than 4 files
-// Jazz param visualization
-// Quantizer visualization
 
 

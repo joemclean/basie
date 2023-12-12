@@ -1,20 +1,23 @@
-#include "ChordTheory.h"
+#include "theory.hpp"
+
+#include <array>
+#include <string>
+#include <vector>
+
+using std::array;
+using std::string;
 
 // Define chords as half steps above root
-struct Chord
+
+Chord::Chord(array<int, 7> tones, string displayName, array<float, 12> chordScale)
 {
-    array<int, 7> tones;
-    string displayName;
-    array<float, 12> chordScale;
-    Chord(array<int, 7> tones, string displayName, array<float, 12> chordScale)
-    {
-        this->tones = tones;
-        this->displayName = displayName;
-        this->chordScale = chordScale;
-    }
-    ~Chord()
-    {
-    }
+    this->tones = tones;
+    this->displayName = displayName;
+    this->chordScale = chordScale;
+};
+
+Chord::~Chord()
+{
 };
 
 array<float, 12> ionianScale = {1, 0, 0.1, 0, 0.5, 0.3, 0, 0.7, 0, 0.3, 0, 0.5};

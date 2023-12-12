@@ -1,8 +1,11 @@
 # Project Name
 TARGET = Basie
 
-# Sources
-CPP_SOURCES = Basie.cpp
+# Source Directory
+SRC_DIR = src
+
+# Add Basie.cpp along with all .cpp files from the src directory
+CPP_SOURCES = Basie.cpp $(wildcard $(SRC_DIR)/*.cpp)
 
 # Library Locations
 LIBDAISY_DIR = ../../libDaisy

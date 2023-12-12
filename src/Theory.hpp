@@ -10,7 +10,9 @@ struct Chord
     std::array<int, 7> tones;
     std::string displayName;
     std::array<float, 12> chordScale;
+
     Chord(std::array<int, 7> tones, std::string displayName, std::array<float, 12> chordScale);
+
     ~Chord();
 };
 
@@ -23,4 +25,4 @@ extern std::array<Chord *, 14> chordList;
 extern std::array<std::string, 12> noteDisplayNames;
 
 
-#endif // CHORD_THEORY_H
+#endif
