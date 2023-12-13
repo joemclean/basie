@@ -4,6 +4,7 @@
 #include "src/theory.hpp"
 #include "src/quantizer.hpp"
 #include "src/sdhandler.hpp"
+#include "src/display.hpp"
 
 #include "fatfs.h"
 
@@ -307,7 +308,6 @@ void Process()
     beatChanging = false;
 }
 
-
 void UpdateOled()
 {
     patch.display.Fill(false);
@@ -329,97 +329,12 @@ void UpdateOled()
 
         patch.display.SetCursor(0, 30);
 
-        int targetScaleSize = targetScale.size();
+        size_t targetScaleSize = targetScale.size();
 
-        bool shouldFill;
-        int whiteKeyIndex = 0;
-        int blackKeyIndex = 0;
+        int ch2XOffset = 50;
 
-        int keyHeight = 14;
-        int keyWidth = 6;
-        int blackKeyOffset = 3;
-        int keyGap = 2;
-        int startingY = 32;
-
-        int ch2Offset = 8 * keyWidth;
-
-        for (int i = 0; i < targetScaleSize; i++) {
-            int targetIndex = (i + 12 - chordRootIndex) % 12;
-
-            // TODO weirdly inverted?
-            shouldFill = false;
-            if (targetScale[targetIndex] >= (1 - jazzAmountCh1))
-            {
-                shouldFill = true;
-            }
-            // White keys
-            if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
-                patch.display.DrawRect(
-                    whiteKeyIndex * keyWidth, 
-                    startingY + keyHeight + keyGap, 
-                    (whiteKeyIndex + 1) * keyWidth, 
-                    startingY + (2 * keyHeight) + keyGap, 
-                    true, 
-                    shouldFill
-                );
-                whiteKeyIndex++;
-            // Black keys
-            } else {
-                patch.display.DrawRect(
-                    blackKeyIndex * keyWidth + blackKeyOffset, 
-                    startingY, 
-                    (blackKeyIndex + 1) * keyWidth + blackKeyOffset, 
-                    startingY + keyHeight, 
-                    true, 
-                    shouldFill
-                );
-                blackKeyIndex++;
-            }
-            if (i == 4) {
-                blackKeyIndex++;
-            }
-        }
-
-        whiteKeyIndex = 0;
-        blackKeyIndex = 0;
-
-        //Ch2 TODO: refactor
-        for (int i = 0; i < targetScaleSize; i++) {
-            int targetIndex = (i + 12 - chordRootIndex) % 12;
-
-            // TODO weirdly inverted?
-            shouldFill = false;
-            if (targetScale[targetIndex] >= (1 - jazzAmountCh2))
-            {
-                shouldFill = true;
-            }
-            // White keys
-            if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
-                patch.display.DrawRect(
-                    whiteKeyIndex * keyWidth + ch2Offset, 
-                    startingY + keyHeight + keyGap, 
-                    (whiteKeyIndex + 1) * keyWidth +ch2Offset, 
-                    startingY + (2 * keyHeight) + keyGap, 
-                    true, 
-                    shouldFill
-                );
-                whiteKeyIndex++;
-            // Black keys
-            } else {
-                patch.display.DrawRect(
-                    blackKeyIndex * keyWidth + blackKeyOffset + ch2Offset, 
-                    startingY, 
-                    (blackKeyIndex + 1) * keyWidth + blackKeyOffset + ch2Offset, 
-                    startingY + keyHeight, 
-                    true, 
-                    shouldFill
-                );
-                blackKeyIndex++;
-            }
-            if (i == 4) {
-                blackKeyIndex++;
-            }
-        }
+        drawKeyboard(targetScale, targetScaleSize, jazzAmountCh1, chordRootIndex, 0, 30);
+        drawKeyboard(targetScale, targetScaleSize, jazzAmountCh2, chordRootIndex, ch2XOffset, 30);
     } else if (displayTabIndex == 1) {
         string headerStr = "File browser";
         patch.display.SetCursor(0, 0);
