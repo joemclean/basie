@@ -18,10 +18,9 @@ using namespace daisy;
 using namespace daisysp;
 
 DaisyPatch patch;
-
-// ---------My variables-------- //
-
 static DaisyPatch hw;
+
+// --- System variables --- //
 
 // Display variables
 vector<string> fileList;
@@ -53,6 +52,9 @@ array<float, 12> targetScale;
 int activeNotes [4];
 
 float jazzAmount = 0.5;
+
+float note1QuantizedVoltage = 0.0;
+float note2QuantizedVoltage = 0.0;
 
 // --- Functions --- //
 
@@ -300,13 +302,8 @@ void Process()
     pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
     pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
 
-    float note1QuantizedVoltage = values1.first;
-    float note2QuantizedVoltage = values2.first;
-
-    patch.seed.dac.WriteValue(DacHandle::Channel::ONE,
-                              note1QuantizedVoltage * 819.2f);
-    patch.seed.dac.WriteValue(DacHandle::Channel::TWO,
-                              note2QuantizedVoltage * 819.2f);
+    note1QuantizedVoltage = values1.first;
+    note2QuantizedVoltage = values2.first;
 
     beatChanging = false;
 }
@@ -411,4 +408,8 @@ void UpdateOled()
 
 void UpdateOutputs()
 {
+    patch.seed.dac.WriteValue(DacHandle::Channel::ONE,
+                              note1QuantizedVoltage * 819.2f);
+    patch.seed.dac.WriteValue(DacHandle::Channel::TWO,
+                              note2QuantizedVoltage * 819.2f);
 }
