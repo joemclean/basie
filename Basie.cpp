@@ -35,6 +35,9 @@ bool beatChanging = false;
 
 int activeNotes [4];
 
+array<float, 12> targetScale;
+float jazzAmount = 0.5;
+
 string errorMessage = "Test message";
 
 int selectedSongIndex = 0;
@@ -235,7 +238,6 @@ void Process()
 
     // Migration TODO: Unused
     // float chordVoltages[7];
-    array<float, 12> targetScale;
 
     int chordRootIndex = 0;
     for (int i = 0; i < 12; i++) {
@@ -316,7 +318,7 @@ void Process()
     // float jazzCV = params[JAZZ_AMT_IN].getValue();
     float jazzCVAttenuation = 0.5;
     // float jazzCVAttenuation = params[JAZZ_CV_ATTENUATOR].getValue();
-    float jazzAmount = jazzKnob + ((jazzCV / 10.0) * jazzCVAttenuation);
+    // float jazzAmount = jazzKnob + ((jazzCV / 10.0) * jazzCVAttenuation);
 
     if (jazzAmount > 1) jazzAmount = 1;
     if (jazzAmount < 0) jazzAmount = 0;
@@ -325,24 +327,11 @@ void Process()
     float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 1.f;
     float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 1.f;
 
-    std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, 0.5); //jazzAmt used to be last arg
-    std::pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, 0.5); //jazzAmt used to be last arg
+    std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmount); //jazzAmt used to be last arg
+    std::pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount); //jazzAmt used to be last arg
 
     float note1QuantizedVoltage = values1.first;
     float note2QuantizedVoltage = values2.first;
-
-    int targetScaleSize = targetScale.size();
-    for (int i = 0; i < targetScaleSize; i++) {
-        // Migration TODO: is this still used?
-        // int targetIndex = (i + chordRootIndex) % 12;
-        // TODO weirdly inverted?
-        if (targetScale[i] >= (1 - jazzAmount))
-        {
-            // Migration TODO: Update interface
-            // setRGBBrightness(quantizerLights[targetIndex], 0.3, 0.3, 0.1);
-            // setRGBBrightness(quantizer2Lights[targetIndex], 0.3, 0.3, 0.1);
-        }
-    }
 
     // Migration TODO: Set quantizer UI
     // setRGBBrightness(quantizerLights[(index1 + chordRootIndex) % 12], 0.0, 0.0, 1.0);
@@ -376,6 +365,30 @@ void UpdateOled()
         patch.display.SetCursor(0, 20);
         str = displayLineThree;
         patch.display.WriteString(cstr, Font_7x10, true);
+
+        patch.display.SetCursor(0, 30);
+
+
+    int targetScaleSize = targetScale.size();
+
+    bool shouldFill;
+    for (int i = 0; i < targetScaleSize; i++) {
+        // Migration TODO: is this still used?
+        // int targetIndex = (i + chordRootIndex) % 12;
+        // TODO weirdly inverted?
+        shouldFill = false;
+
+        if (targetScale[i] >= (1 - jazzAmount))
+        {
+            shouldFill = true;
+            // Migration TODO: Update interface
+            // setRGBBrightness(quantizerLights[targetIndex], 0.3, 0.3, 0.1);
+            // setRGBBrightness(quantizer2Lights[targetIndex], 0.3, 0.3, 0.1);
+        }
+
+        patch.display.DrawRect(i*10, 40, (i+1) * 10, 40 + 20, true, shouldFill);
+    }
+
     } else if (displayTabIndex == 1) {
         std::string headerStr = "File browser";
         patch.display.SetCursor(0, 0);
