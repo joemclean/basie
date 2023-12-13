@@ -1,5 +1,6 @@
 #include "daisysp.h"
 #include "daisy_patch.h"
+
 #include "src/theory.hpp"
 #include "src/quantizer.hpp"
 #include "src/sdhandler.hpp"
@@ -22,41 +23,38 @@ DaisyPatch patch;
 
 static DaisyPatch hw;
 
+// Display variables
 vector<string> fileList;
 int fileListCursor = 0;
 int loadedFileIndex = 0;
 int fileListPageIndex = 0;
 
+string displayLineOne = "";
+string displayLineTwo = "";
+string displayLineThree = "";
+string chordDisplay;
+
 int displayTabIndex = 0;
 bool encoderIsHeld = false;
 bool tabChangeInProcess = false;
 
-bool beatChanging = false;
-
-int activeNotes [4];
-
-array<float, 12> targetScale;
-float jazzAmount = 0.5;
-
-string errorMessage = "Test message";
-
-int selectedSongIndex = 0;
-string chordDisplay = "";
-string songName = "-";
-
+// Module state variables
 vector<string> currentSongChords;
-
-string displayLineOne = "";
-string displayLineTwo = "";
-string displayLineThree = "";
-
 int playhead = 0;
+
+bool beatChanging = false;
 
 int chordType = 0;
 int chordRootIndex = 0;
 
+Chord *targetChord;
+array<float, 12> targetScale;
 
-// ----------------- //
+int activeNotes [4];
+
+float jazzAmount = 0.5;
+
+// --- Functions --- //
 
 void MIDISendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
     uint8_t data[3] = { 0 };
@@ -86,8 +84,8 @@ void clearMidi() {
 
 void UpdateControls();
 void UpdateOled();
-void UpdateOutputs();
 void Process();
+void UpdateOutputs();
 
 // Helper function to trim whitespace from the start and end of a string
 string trim(const string& str) {
@@ -135,27 +133,6 @@ void loadSong(string fileName)
     playhead = 0;
 }
 
-int main(void)
-{
-    patch.Init(); // Initialize hardware (daisy seed, and patch)
-
-    fileList = listTxtFiles("/");
-    loadSong(fileList[0]);
-
-    patch.StartAdc();
-    while(1)
-    {
-        UpdateControls();
-        UpdateOled();
-        Process();
-        UpdateOutputs();
-    }
-
-    for (size_t i = 0; i < chordList.size(); i++) {
-        delete chordList[i];
-    }
-}
-
 void ProcessEncoder()
 {
     if (patch.encoder.RisingEdge()) {
@@ -197,15 +174,35 @@ void UpdateControls()
 {
     patch.ProcessAnalogControls();
     patch.ProcessDigitalControls();
-
     ProcessEncoder();
+}
+
+// --- Implementation --- //
+
+int main(void)
+{
+    patch.Init(); // Initialize hardware (daisy seed, and patch)
+
+    fileList = listTxtFiles("/");
+    loadSong(fileList[0]);
+
+    patch.StartAdc();
+    while(1)
+    {
+        UpdateControls();
+        UpdateOled();
+        Process();
+        UpdateOutputs();
+    }
+
+    for (size_t i = 0; i < chordList.size(); i++) {
+        delete chordList[i];
+    }
 }
 
 void Process()
 {                                                                                                                   
     // Advance the playhead on clock trigger
-    Chord *targetChord;
-    
     if (patch.gate_input[0].Trig())
     {
         beatChanging = true;
@@ -220,26 +217,23 @@ void Process()
     }
 
     // TODO - only do all of this if the playhead advances
-    string chord = currentSongChords[playhead];
+    string chordString = currentSongChords[playhead];
 
     string chordRoot = "C";
     string chordType = "maj7";
 
     char chordBuffer[10];
-    strcpy(chordBuffer, chord.c_str());
+    strcpy(chordBuffer, chordString.c_str());
 
     char chordRootBuffer[10];
     char chordTypeBuffer[10];
 
     strcpy(chordRootBuffer, strtok(chordBuffer, " "));
     strcpy(chordTypeBuffer, strtok(NULL, " "));
-    // Prepare the chord and scale based on the chord type
 
+    // Prepare the chord and scale based on the chord type
     chordRoot = chordRootBuffer;
     chordType = chordTypeBuffer;
-
-    // Migration TODO: Unused
-    // float chordVoltages[7];
 
     for (int i = 0; i < 12; i++) {
         if (chordRoot == noteDisplayNames[i])
@@ -248,6 +242,7 @@ void Process()
         }
     }
 
+    // Match the current progression chord against available chords
     targetChord = chordList[0]; // initialize with default
     for (size_t i = 0; i < chordList.size(); i++) {
         if (chordList[i]->displayName == chordType) {
@@ -255,57 +250,32 @@ void Process()
         }
     }
 
-    // Iterate over chord tones to get an array of voltages
-    float chordRootOffsetVoltage = (float)chordRootIndex / 12.0;
-    int chordToneCount = targetChord->tones.size();
 
-    for (int i = 0; i < 12; i++) 
-    {
-        // Migration TODO: UPDATE INTERFACE
-        // setRGBBrightness(chordLights[i], 0, 0, 0);
-        // setRGBBrightness(quantizerLights[i], 0, 0, 0);
-        // setRGBBrightness(quantizer2Lights[i], 0, 0, 0);
-    }
+    // Iterate over active chord tones and output as MIDI notes
+    int chordToneCount = targetChord->tones.size();
     if (beatChanging) {
         clearMidi();
-    }
-
-    for (int i = 0; i < chordToneCount; i++)
-    {   
-        int chordTone = targetChord->tones[i];
-        // TODO Abstract this
-        // Migration TODO: Reimplement voicing type
-        // Migration TODO: UI
-        int targetMidiNote = 36 + chordRootIndex + chordTone;
-        if (beatChanging == true && i < 4)
-        {
-            if (i > 0) {
-                targetMidiNote = targetMidiNote + 12;
+        for (int i = 0; i < chordToneCount; i++)
+        {   
+            int chordTone = targetChord->tones[i];
+            // TODO Abstract this
+            // Migration TODO: Reimplement voicing type
+            // Migration TODO: UI
+            int targetMidiNote = 36 + chordRootIndex + chordTone;
+            if (i < 4)
+            {
+                if (i > 0) {
+                    targetMidiNote = targetMidiNote + 12;
+                }
+                activeNotes[i] = targetMidiNote;
+                MIDISendNoteOn(0, targetMidiNote, 100);
             }
-            activeNotes[i] = targetMidiNote;
-            MIDISendNoteOn(0, targetMidiNote, 100);
         }
-
-        // int targetLightIndex = (chordRootIndex + chordTone) % 12;
-        // int targetLightIndex = (chordRootIndex + chordTone) % 12;
-        // setRGBBrightness(chordLights[targetLightIndex], 0.1, 0.1, 0.05);
     }
-
-    // Write the chord tones to output
-    // Migration TODO: Write output values
-
-    // outputs[CV_OUTPUT_1].setVoltage(chordVoltages[0]);
-    // outputs[CV_OUTPUT_2].setVoltage(chordVoltages[1]);
-    // outputs[CV_OUTPUT_3].setVoltage(chordVoltages[2]);
-    // outputs[CV_OUTPUT_4].setVoltage(chordVoltages[3]);
-    // outputs[CV_OUTPUT_5].setVoltage(chordVoltages[4]);
-    // outputs[CV_OUTPUT_6].setVoltage(chordVoltages[5]);
-    // outputs[CV_OUTPUT_7].setVoltage(chordVoltages[6]);
 
     // Update the display with human names for the current chord
     chordDisplay = noteDisplayNames[chordRootIndex] + targetChord->displayName;
 
-    // Migration TODO: Update display
     displayLineTwo = "Current chord:";
     displayLineThree = chordDisplay; 
 
@@ -328,15 +298,13 @@ void Process()
     float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 1.f;
     float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 1.f;
 
-    pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmount); //jazzAmt used to be last arg
-    pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount); //jazzAmt used to be last arg
+    // Quantize the inputs to active notes in the target scale
+    float chordRootOffsetVoltage = (float)chordRootIndex / 12.0;
+    pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
+    pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
 
     float note1QuantizedVoltage = values1.first;
     float note2QuantizedVoltage = values2.first;
-
-    // Migration TODO: Set quantizer UI
-    // setRGBBrightness(quantizerLights[(index1 + chordRootIndex) % 12], 0.0, 0.0, 1.0);
-    // setRGBBrightness(quantizer2Lights[(index2 + chordRootIndex) % 12], 0.0, 1.0, 0);
 
     patch.seed.dac.WriteValue(DacHandle::Channel::ONE,
                               note1QuantizedVoltage * 819.2f);
@@ -344,7 +312,6 @@ void Process()
                               note2QuantizedVoltage * 819.2f);
 
     beatChanging = false;
-
 }
 
 
@@ -383,15 +350,15 @@ void UpdateOled()
     int startingY = 32;
 
     for (int i = 0; i < targetScaleSize; i++) {
-        // Migration TODO: is this still used?
         int targetIndex = (i + 12 - chordRootIndex) % 12;
+
         // TODO weirdly inverted?
         shouldFill = false;
-
         if (targetScale[targetIndex] >= (1 - jazzAmount))
         {
             shouldFill = true;
         }
+        // White keys
         if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
             patch.display.DrawRect(
                 whiteKeyIndex * (keyWidth + keyGap), 
@@ -402,6 +369,7 @@ void UpdateOled()
                 shouldFill
             );
             whiteKeyIndex++;
+        // Black keys
         } else {
             patch.display.DrawRect(
                 blackKeyIndex * (keyWidth + keyGap) + blackKeyOffset, 

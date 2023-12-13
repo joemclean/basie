@@ -1,10 +1,10 @@
 #ifndef QUANTIZER_H
 #define QUANTIZER_H
 
-#include <vector>
+#include <array>
 
-using std::vector;
 using std::pair;
+using std::array;
 
 pair<float, int> quantizeToScale(
   const float& noteInVoltage, 
