@@ -51,7 +51,8 @@ array<float, 12> targetScale;
 
 int activeNotes [4];
 
-float jazzAmount = 0.5;
+float jazzAmountCh1 = 0.5;
+float jazzAmountCh2 = 0.5;
 
 float note1QuantizedVoltage = 0.0;
 float note2QuantizedVoltage = 0.0;
@@ -275,32 +276,30 @@ void Process()
     // Update the display with human names for the current chord
     chordDisplay = noteDisplayNames[chordRootIndex] + targetChord->displayName;
 
-    displayLineTwo = "Current chord:";
+    displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
     displayLineThree = chordDisplay; 
 
     // Quantize input to output
     targetScale = targetChord->chordScale;
 
-    // Migration TODO: Actually read Jazz param
-    float jazzKnob =  0.5;
-    // float jazzKnob =  params[JAZZ_PARAM].getValue();
-    float jazzCV = 0.5;
-    // float jazzCV = params[JAZZ_AMT_IN].getValue();
-    float jazzCVAttenuation = 0.5;
-    // float jazzCVAttenuation = params[JAZZ_CV_ATTENUATOR].getValue();
-    // float jazzAmount = jazzKnob + ((jazzCV / 10.0) * jazzCVAttenuation);
+    jazzAmountCh1 = patch.GetKnobValue((DaisyPatch::Ctrl)2) * 1.f;
+    jazzAmountCh2 = patch.GetKnobValue((DaisyPatch::Ctrl)3) * 1.f;
 
-    if (jazzAmount > 1) jazzAmount = 1;
-    if (jazzAmount < 0) jazzAmount = 0;
+    if (jazzAmountCh1 > 1) jazzAmountCh1 = 1;
+    if (jazzAmountCh1 < 0) jazzAmountCh1 = 0;
+
+
+    if (jazzAmountCh2 > 1) jazzAmountCh2 = 1;
+    if (jazzAmountCh2 < 0) jazzAmountCh2 = 0;
 
     // Read quantizer ins
-    float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 1.f;
-    float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 1.f;
+    float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 5.f;
+    float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 5.f;
 
     // Quantize the inputs to active notes in the target scale
     float chordRootOffsetVoltage = (float)chordRootIndex / 12.0;
-    pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
-    pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount);
+    pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh1);
+    pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh2);
 
     note1QuantizedVoltage = values1.first;
     note2QuantizedVoltage = values2.first;
@@ -342,21 +341,23 @@ void UpdateOled()
         int keyGap = 2;
         int startingY = 32;
 
+        int ch2Offset = 8 * keyWidth;
+
         for (int i = 0; i < targetScaleSize; i++) {
             int targetIndex = (i + 12 - chordRootIndex) % 12;
 
             // TODO weirdly inverted?
             shouldFill = false;
-            if (targetScale[targetIndex] >= (1 - jazzAmount))
+            if (targetScale[targetIndex] >= (1 - jazzAmountCh1))
             {
                 shouldFill = true;
             }
             // White keys
             if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
                 patch.display.DrawRect(
-                    whiteKeyIndex * (keyWidth + keyGap), 
+                    whiteKeyIndex * keyWidth, 
                     startingY + keyHeight + keyGap, 
-                    (whiteKeyIndex + 1) * (keyWidth + keyGap), 
+                    (whiteKeyIndex + 1) * keyWidth, 
                     startingY + (2 * keyHeight) + keyGap, 
                     true, 
                     shouldFill
@@ -365,9 +366,50 @@ void UpdateOled()
             // Black keys
             } else {
                 patch.display.DrawRect(
-                    blackKeyIndex * (keyWidth + keyGap) + blackKeyOffset, 
+                    blackKeyIndex * keyWidth + blackKeyOffset, 
                     startingY, 
-                    (blackKeyIndex + 1) * (keyWidth + keyGap) + blackKeyOffset, 
+                    (blackKeyIndex + 1) * keyWidth + blackKeyOffset, 
+                    startingY + keyHeight, 
+                    true, 
+                    shouldFill
+                );
+                blackKeyIndex++;
+            }
+            if (i == 4) {
+                blackKeyIndex++;
+            }
+        }
+
+        whiteKeyIndex = 0;
+        blackKeyIndex = 0;
+
+        //Ch2 TODO: refactor
+        for (int i = 0; i < targetScaleSize; i++) {
+            int targetIndex = (i + 12 - chordRootIndex) % 12;
+
+            // TODO weirdly inverted?
+            shouldFill = false;
+            if (targetScale[targetIndex] >= (1 - jazzAmountCh2))
+            {
+                shouldFill = true;
+            }
+            // White keys
+            if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
+                patch.display.DrawRect(
+                    whiteKeyIndex * keyWidth + ch2Offset, 
+                    startingY + keyHeight + keyGap, 
+                    (whiteKeyIndex + 1) * keyWidth +ch2Offset, 
+                    startingY + (2 * keyHeight) + keyGap, 
+                    true, 
+                    shouldFill
+                );
+                whiteKeyIndex++;
+            // Black keys
+            } else {
+                patch.display.DrawRect(
+                    blackKeyIndex * keyWidth + blackKeyOffset + ch2Offset, 
+                    startingY, 
+                    (blackKeyIndex + 1) * keyWidth + blackKeyOffset + ch2Offset, 
                     startingY + keyHeight, 
                     true, 
                     shouldFill
