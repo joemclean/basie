@@ -250,17 +250,14 @@ void Process()
         }
     }
 
-
     // Iterate over active chord tones and output as MIDI notes
     int chordToneCount = targetChord->tones.size();
     if (beatChanging) {
         clearMidi();
         for (int i = 0; i < chordToneCount; i++)
         {   
-            int chordTone = targetChord->tones[i];
-            // TODO Abstract this
+            int chordTone = targetChord->tones[i];  
             // Migration TODO: Reimplement voicing type
-            // Migration TODO: UI
             int targetMidiNote = 36 + chordRootIndex + chordTone;
             if (i < 4)
             {
@@ -336,56 +333,54 @@ void UpdateOled()
 
         patch.display.SetCursor(0, 30);
 
+        int targetScaleSize = targetScale.size();
 
-    int targetScaleSize = targetScale.size();
+        bool shouldFill;
+        int whiteKeyIndex = 0;
+        int blackKeyIndex = 0;
 
-    bool shouldFill;
-    int whiteKeyIndex = 0;
-    int blackKeyIndex = 0;
+        int keyHeight = 14;
+        int keyWidth = 6;
+        int blackKeyOffset = 3;
+        int keyGap = 2;
+        int startingY = 32;
 
-    int keyHeight = 14;
-    int keyWidth = 6;
-    int blackKeyOffset = 3;
-    int keyGap = 2;
-    int startingY = 32;
+        for (int i = 0; i < targetScaleSize; i++) {
+            int targetIndex = (i + 12 - chordRootIndex) % 12;
 
-    for (int i = 0; i < targetScaleSize; i++) {
-        int targetIndex = (i + 12 - chordRootIndex) % 12;
-
-        // TODO weirdly inverted?
-        shouldFill = false;
-        if (targetScale[targetIndex] >= (1 - jazzAmount))
-        {
-            shouldFill = true;
+            // TODO weirdly inverted?
+            shouldFill = false;
+            if (targetScale[targetIndex] >= (1 - jazzAmount))
+            {
+                shouldFill = true;
+            }
+            // White keys
+            if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
+                patch.display.DrawRect(
+                    whiteKeyIndex * (keyWidth + keyGap), 
+                    startingY + keyHeight + keyGap, 
+                    (whiteKeyIndex + 1) * (keyWidth + keyGap), 
+                    startingY + (2 * keyHeight) + keyGap, 
+                    true, 
+                    shouldFill
+                );
+                whiteKeyIndex++;
+            // Black keys
+            } else {
+                patch.display.DrawRect(
+                    blackKeyIndex * (keyWidth + keyGap) + blackKeyOffset, 
+                    startingY, 
+                    (blackKeyIndex + 1) * (keyWidth + keyGap) + blackKeyOffset, 
+                    startingY + keyHeight, 
+                    true, 
+                    shouldFill
+                );
+                blackKeyIndex++;
+            }
+            if (i == 4) {
+                blackKeyIndex++;
+            }
         }
-        // White keys
-        if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
-            patch.display.DrawRect(
-                whiteKeyIndex * (keyWidth + keyGap), 
-                startingY + keyHeight + keyGap, 
-                (whiteKeyIndex + 1) * (keyWidth + keyGap), 
-                startingY + (2 * keyHeight) + keyGap, 
-                true, 
-                shouldFill
-            );
-            whiteKeyIndex++;
-        // Black keys
-        } else {
-            patch.display.DrawRect(
-                blackKeyIndex * (keyWidth + keyGap) + blackKeyOffset, 
-                startingY, 
-                (blackKeyIndex + 1) * (keyWidth + keyGap) + blackKeyOffset, 
-                startingY + keyHeight, 
-                true, 
-                shouldFill
-            );
-            blackKeyIndex++;
-        }
-        if (i == 4) {
-            blackKeyIndex++;
-        }
-    }
-
     } else if (displayTabIndex == 1) {
         string headerStr = "File browser";
         patch.display.SetCursor(0, 0);
@@ -417,5 +412,3 @@ void UpdateOled()
 void UpdateOutputs()
 {
 }
-
-
