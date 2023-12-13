@@ -126,7 +126,7 @@ vector<string> parseChords(const string& chordString) {
     return chords;
 }
 
-void loadSong(string fileName) 
+void loadSong(const string& fileName) 
 {
     clearMidi();
     string fileChords = loadChordsFromFile(fileName);
