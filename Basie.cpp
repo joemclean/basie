@@ -53,6 +53,8 @@ string displayLineThree = "";
 int playhead = 0;
 
 int chordType = 0;
+int chordRootIndex = 0;
+
 
 // ----------------- //
 
@@ -239,7 +241,6 @@ void Process()
     // Migration TODO: Unused
     // float chordVoltages[7];
 
-    int chordRootIndex = 0;
     for (int i = 0; i < 12; i++) {
         if (chordRoot == noteDisplayNames[i])
         {
@@ -372,21 +373,49 @@ void UpdateOled()
     int targetScaleSize = targetScale.size();
 
     bool shouldFill;
+    int whiteKeyIndex = 0;
+    int blackKeyIndex = 0;
+
+    int keyHeight = 14;
+    int keyWidth = 6;
+    int blackKeyOffset = 3;
+    int keyGap = 2;
+    int startingY = 32;
+
     for (int i = 0; i < targetScaleSize; i++) {
         // Migration TODO: is this still used?
-        // int targetIndex = (i + chordRootIndex) % 12;
+        int targetIndex = (i + 12 - chordRootIndex) % 12;
         // TODO weirdly inverted?
         shouldFill = false;
 
-        if (targetScale[i] >= (1 - jazzAmount))
+        if (targetScale[targetIndex] >= (1 - jazzAmount))
         {
             shouldFill = true;
-            // Migration TODO: Update interface
-            // setRGBBrightness(quantizerLights[targetIndex], 0.3, 0.3, 0.1);
-            // setRGBBrightness(quantizer2Lights[targetIndex], 0.3, 0.3, 0.1);
         }
-
-        patch.display.DrawRect(i*10, 40, (i+1) * 10, 40 + 20, true, shouldFill);
+        if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
+            patch.display.DrawRect(
+                whiteKeyIndex * (keyWidth + keyGap), 
+                startingY + keyHeight + keyGap, 
+                (whiteKeyIndex + 1) * (keyWidth + keyGap), 
+                startingY + (2 * keyHeight) + keyGap, 
+                true, 
+                shouldFill
+            );
+            whiteKeyIndex++;
+        } else {
+            patch.display.DrawRect(
+                blackKeyIndex * (keyWidth + keyGap) + blackKeyOffset, 
+                startingY, 
+                (blackKeyIndex + 1) * (keyWidth + keyGap) + blackKeyOffset, 
+                startingY + keyHeight, 
+                true, 
+                shouldFill
+            );
+            blackKeyIndex++;
+        }
+        if (i == 4) {
+            blackKeyIndex++;
+        }
     }
 
     } else if (displayTabIndex == 1) {
