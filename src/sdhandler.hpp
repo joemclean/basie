@@ -4,8 +4,11 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> listTxtFiles(const char* path);
+using std::string;
+using std::vector;
 
-std::string loadChordsFromFile(std::string filePath);
+vector<string> listTxtFiles(const char* path);
+
+string loadChordsFromFile(string filePath);
 
 #endif

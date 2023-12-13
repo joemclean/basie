@@ -3,26 +3,28 @@
 
 #include <array>
 #include <string>
-#include <vector>
+
+using std::string;
+using std::array;
 
 struct Chord 
 {
-    std::array<int, 7> tones;
-    std::string displayName;
-    std::array<float, 12> chordScale;
+    array<int, 7> tones;
+    string displayName;
+    array<float, 12> chordScale;
 
-    Chord(std::array<int, 7> tones, std::string displayName, std::array<float, 12> chordScale);
+    Chord(array<int, 7> tones, string displayName, array<float, 12> chordScale);
 
     ~Chord();
 };
 
 struct ChordScale
 {
-    std::array<int, 12> tones;
+    array<int, 12> tones;
 };
 
-extern std::array<Chord *, 14> chordList;
-extern std::array<std::string, 12> noteDisplayNames;
+extern array<Chord *, 14> chordList;
+extern array<string, 12> noteDisplayNames;
 
 
 #endif

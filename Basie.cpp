@@ -1,7 +1,5 @@
 #include "daisysp.h"
 #include "daisy_patch.h"
-#include <string>
-#include <array>
 #include "src/theory.hpp"
 #include "src/quantizer.hpp"
 #include "src/sdhandler.hpp"
@@ -12,6 +10,8 @@
 
 using std::array;
 using std::string;
+using std::vector;
+using std::pair;
 
 using namespace daisy;
 using namespace daisysp;
@@ -22,7 +22,7 @@ DaisyPatch patch;
 
 static DaisyPatch hw;
 
-std::vector<std::string> fileList;
+vector<string> fileList;
 int fileListCursor = 0;
 int loadedFileIndex = 0;
 int fileListPageIndex = 0;
@@ -44,7 +44,7 @@ int selectedSongIndex = 0;
 string chordDisplay = "";
 string songName = "-";
 
-std::vector<std::string> currentSongChords;
+vector<string> currentSongChords;
 
 string displayLineOne = "";
 string displayLineTwo = "";
@@ -90,9 +90,9 @@ void UpdateOutputs();
 void Process();
 
 // Helper function to trim whitespace from the start and end of a string
-std::string trim(const std::string& str) {
+string trim(const string& str) {
     size_t first = str.find_first_not_of(" \n\r\t\f\v");
-    if (first == std::string::npos) {
+    if (first == string::npos) {
         return "";
     }
     size_t last = str.find_last_not_of(" \n\r\t\f\v");
@@ -100,9 +100,9 @@ std::string trim(const std::string& str) {
 }
 
 // Parse chords string into a vector that can be iterated over
-std::vector<std::string> parseChords(const std::string& chordString) {
-    std::vector<std::string> chords;
-    std::string chord;
+vector<string> parseChords(const string& chordString) {
+    vector<string> chords;
+    string chord;
     bool insideChord = false;
 
     for (char c : chordString) {
@@ -112,7 +112,7 @@ std::vector<std::string> parseChords(const std::string& chordString) {
                 chord.clear();
             }
             insideChord = false;
-        } else if (!std::isspace(static_cast<unsigned char>(c)) || insideChord) {
+        } else if (!isspace(static_cast<unsigned char>(c)) || insideChord) {
             insideChord = true;
             chord += c;
         }
@@ -151,7 +151,7 @@ int main(void)
         UpdateOutputs();
     }
 
-    for (std::size_t i = 0; i < chordList.size(); i++) {
+    for (size_t i = 0; i < chordList.size(); i++) {
         delete chordList[i];
     }
 }
@@ -220,7 +220,7 @@ void Process()
     }
 
     // TODO - only do all of this if the playhead advances
-    std::string chord = currentSongChords[playhead];
+    string chord = currentSongChords[playhead];
 
     string chordRoot = "C";
     string chordType = "maj7";
@@ -249,7 +249,7 @@ void Process()
     }
 
     targetChord = chordList[0]; // initialize with default
-    for (std::size_t i = 0; i < chordList.size(); i++) {
+    for (size_t i = 0; i < chordList.size(); i++) {
         if (chordList[i]->displayName == chordType) {
             targetChord = chordList[i];
         }
@@ -328,8 +328,8 @@ void Process()
     float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 1.f;
     float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 1.f;
 
-    std::pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmount); //jazzAmt used to be last arg
-    std::pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount); //jazzAmt used to be last arg
+    pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmount); //jazzAmt used to be last arg
+    pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmount); //jazzAmt used to be last arg
 
     float note1QuantizedVoltage = values1.first;
     float note2QuantizedVoltage = values2.first;
@@ -353,7 +353,7 @@ void UpdateOled()
     patch.display.Fill(false);
     if (displayTabIndex == 0) 
     {
-        std::string str  = displayLineOne;
+        string str  = displayLineOne;
         char*       cstr = &str[0];
 
         patch.display.SetCursor(0, 0);
@@ -419,7 +419,7 @@ void UpdateOled()
     }
 
     } else if (displayTabIndex == 1) {
-        std::string headerStr = "File browser";
+        string headerStr = "File browser";
         patch.display.SetCursor(0, 0);
         patch.display.WriteString(headerStr.c_str(), Font_7x10, true);
 
@@ -435,7 +435,7 @@ void UpdateOled()
 
         for (int i = lowerPageBound; i < upperPageBound; i++ ) {
             patch.display.SetCursor(0, (i + 1 - (filesPerPage * fileListPageIndex)) * 10);
-            std::string fileStr;
+            string fileStr;
             fileListCursor == i ? fileStr += ">" : fileStr += " ";
             loadedFileIndex == i ? fileStr += "*" : fileStr += " ";
             fileStr += fileList[i];

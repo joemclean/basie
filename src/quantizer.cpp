@@ -1,7 +1,13 @@
 #include "quantizer.hpp"
 #include <math.h>
 
-std::pair<float, int> quantizeToScale(const float& noteInVoltage, const float& chordRootOffsetVoltage, const std::array<float, 12>& targetScale, const float& jazzAmount)
+#include <array>
+
+using std::array;
+using std::pair;
+using std::make_pair;
+
+pair<float, int> quantizeToScale(const float& noteInVoltage, const float& chordRootOffsetVoltage, const array<float, 12>& targetScale, const float& jazzAmount)
 {
     float whole, fractional;
     float jazzThreshold = 1.0 - jazzAmount;
@@ -25,5 +31,5 @@ std::pair<float, int> quantizeToScale(const float& noteInVoltage, const float& c
     }
     float baseNoteVoltage = (float)nearestScaleToneIndex / 12;
     float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
-    return std::make_pair(targetNoteVoltage, nearestScaleToneIndex);
+    return make_pair(targetNoteVoltage, nearestScaleToneIndex);
 }

@@ -4,6 +4,9 @@
 #include "sdhandler.hpp"
 #include "fatfs.h"
 
+using std::string;
+using std::vector;
+
 using namespace daisy;
 using namespace daisysp;
 
@@ -20,9 +23,9 @@ UINT br;        // Read count
 constexpr size_t bufferSize = 4096; // Example size, adjust as needed
 char buffer[bufferSize] = {0};
 
-std::vector<std::string> listTxtFiles(const char* path) {
+vector<string> listTxtFiles(const char* path) {
 
-    std::vector<std::string> txtFiles;
+    vector<string> txtFiles;
 
     // Init SD Card
     SdmmcHandler::Config sd_cfg;
@@ -44,7 +47,7 @@ std::vector<std::string> listTxtFiles(const char* path) {
                 // It's a directory, you can ignore or handle accordingly
             } else { 
                 // It's a file, check if it's a .txt file
-                std::string fileName = fno.fname;
+                string fileName = fno.fname;
                 if (fileName.size() >= 4 && fileName.substr(fileName.size() - 4) == ".txt") {
                     txtFiles.push_back(fileName);
                 }
@@ -55,9 +58,9 @@ std::vector<std::string> listTxtFiles(const char* path) {
     return txtFiles;
 }
 
-std::string loadChordsFromFile(std::string filePath)
+string loadChordsFromFile(string filePath)
 {
-    std::string chordData;
+    string chordData;
 
     // Init SD Card
     SdmmcHandler::Config sd_cfg;
@@ -81,7 +84,7 @@ std::string loadChordsFromFile(std::string filePath)
             buffer[br] = '\0';
             
             // Now 'buffer' contains the entire file content as a C-style string
-            std::string fileContent(buffer);
+            string fileContent(buffer);
             chordData = fileContent;
 
         }

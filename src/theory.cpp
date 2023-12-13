@@ -1,11 +1,10 @@
 #include "theory.hpp"
 
-#include <array>
 #include <string>
-#include <vector>
+#include <array>
 
-using std::array;
 using std::string;
+using std::array;
 
 // Define chords as half steps above root
 
