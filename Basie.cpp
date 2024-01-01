@@ -187,6 +187,7 @@ int main(void)
 {
     patch.Init(); // Initialize hardware (daisy seed, and patch)
 
+    initSDCard();
     fileList = listTxtFiles("/");
     loadSong(fileList[0]);
 
@@ -288,7 +289,6 @@ void Process()
 
     if (jazzAmountCh1 > 1) jazzAmountCh1 = 1;
     if (jazzAmountCh1 < 0) jazzAmountCh1 = 0;
-
 
     if (jazzAmountCh2 > 1) jazzAmountCh2 = 1;
     if (jazzAmountCh2 < 0) jazzAmountCh2 = 0;

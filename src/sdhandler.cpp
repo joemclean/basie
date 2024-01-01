@@ -23,10 +23,8 @@ UINT br;        // Read count
 constexpr size_t bufferSize = 4096; // Example size, adjust as needed
 char buffer[bufferSize] = {0};
 
-vector<string> listTxtFiles(const char* path) {
-
-    vector<string> txtFiles;
-
+void initSDCard() 
+{
     // Init SD Card
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
@@ -37,6 +35,11 @@ vector<string> listTxtFiles(const char* path) {
 
     // Mount SD Card
     f_mount(&fsi.GetSDFileSystem(), "/", 1);
+}
+
+vector<string> listTxtFiles(const char* path) {
+
+    vector<string> txtFiles;
 
     fr = f_opendir(&dir, path);  // Open the directory
     if (fr == FR_OK) {
@@ -61,17 +64,6 @@ vector<string> listTxtFiles(const char* path) {
 string loadChordsFromFile(string filePath)
 {
     string chordData;
-
-    // Init SD Card
-    SdmmcHandler::Config sd_cfg;
-    sd_cfg.Defaults();
-    sd.Init(sd_cfg);
-
-    // Links libdaisy i/o to fatfs driver.
-    fsi.Init(FatFSInterface::Config::MEDIA_SD);
-
-    // Mount SD Card
-    f_mount(&fsi.GetSDFileSystem(), "/", 1);
 
     // Try to open the file
     fr = f_open(&file, filePath.c_str(), FA_READ);

@@ -20,7 +20,7 @@ Chord::~Chord()
 };
 
 array<float, 12> ionianScale = {1, 0, 0.1, 0, 0.5, 0.3, 0, 0.7, 0, 0.3, 0, 0.5};
-array<float, 12> dorianScale = {1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0};
+array<float, 12> dorianScale = {1, 0, 0.3, 0.5, 0, 0.3, 0, 0.7, 0, 0.1, 0.7, 0};
 array<float, 12> phrygianScale = {1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0};
 array<float, 12> lydianScale = {1, 0, 0.1, 0, 0.5, 0, 0.7, 0.7, 0, 0.3, 0, 0.6};
 array<float, 12> lydianDominantScale = {1, 0, 0.1, 0, 0.5, 0, 0.7, 0.7, 0, 0.3, 0.6, 0};
