@@ -85,3 +85,41 @@ string loadChordsFromFile(string filePath)
 
     return chordData;
 }
+
+
+// Helper function to trim whitespace from the start and end of a string
+string trim(const string& str) {
+    size_t first = str.find_first_not_of(" \n\r\t\f\v");
+    if (first == string::npos) {
+        return "";
+    }
+    size_t last = str.find_last_not_of(" \n\r\t\f\v");
+    return str.substr(first, (last - first + 1));
+}
+
+// Parse chords string into a vector that can be iterated over
+vector<string> parseChords(const string& chordString) {
+    vector<string> chords;
+    string chord;
+    bool insideChord = false;
+
+    for (char c : chordString) {
+        if (c == '|') {
+            if (!chord.empty()) {
+                chords.push_back(trim(chord));
+                chord.clear();
+            }
+            insideChord = false;
+        } else if (!isspace(static_cast<unsigned char>(c)) || insideChord) {
+            insideChord = true;
+            chord += c;
+        }
+    }
+
+    // Add the last chord if there is one
+    if (!chord.empty()) {
+        chords.push_back(trim(chord));
+    }
+
+    return chords;
+}

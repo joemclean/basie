@@ -8,7 +8,6 @@
 #include "src/MIDI.hpp"
 
 // for convenience
-
 using std::array;
 using std::string;
 using std::vector;
@@ -56,46 +55,9 @@ float note1QuantizedVoltage = 0.0;
 float note2QuantizedVoltage = 0.0;
 
 void UpdateControls();
-void UpdateOled();
 void Process();
+void UpdateOled();
 void UpdateOutputs();
-
-// Helper function to trim whitespace from the start and end of a string
-string trim(const string& str) {
-    size_t first = str.find_first_not_of(" \n\r\t\f\v");
-    if (first == string::npos) {
-        return "";
-    }
-    size_t last = str.find_last_not_of(" \n\r\t\f\v");
-    return str.substr(first, (last - first + 1));
-}
-
-// Parse chords string into a vector that can be iterated over
-vector<string> parseChords(const string& chordString) {
-    vector<string> chords;
-    string chord;
-    bool insideChord = false;
-
-    for (char c : chordString) {
-        if (c == '|') {
-            if (!chord.empty()) {
-                chords.push_back(trim(chord));
-                chord.clear();
-            }
-            insideChord = false;
-        } else if (!isspace(static_cast<unsigned char>(c)) || insideChord) {
-            insideChord = true;
-            chord += c;
-        }
-    }
-
-    // Add the last chord if there is one
-    if (!chord.empty()) {
-        chords.push_back(trim(chord));
-    }
-
-    return chords;
-}
 
 void loadSong(const string& fileName) 
 {
@@ -140,7 +102,6 @@ void ProcessEncoder()
             }
         }
     }
-    UpdateOled();
 }
 
 void UpdateControls()
@@ -155,22 +116,18 @@ void UpdateControls()
 int main(void)
 {
     patch.Init(); // Initialize hardware (daisy seed, and patch)
+    patch.StartAdc();
 
     initSDCard();
     fileList = listTxtFiles("/");
     loadSong(fileList[0]);
 
-    patch.StartAdc();
     while(1)
     {
         UpdateControls();
         UpdateOled();
         Process();
         UpdateOutputs();
-    }
-
-    for (size_t i = 0; i < chordList.size(); i++) {
-        delete chordList[i];
     }
 }
 
@@ -190,7 +147,7 @@ void Process()
         playhead = 0;
     }
 
-    // TODO - only do all of this if the playhead advances
+    // TODO - only bother processing all of this if the playhead advances
     string chordString = currentSongChords[playhead];
 
     string chordRoot = "C";
