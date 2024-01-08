@@ -5,8 +5,7 @@
 #include "src/quantizer.hpp"
 #include "src/sdhandler.hpp"
 #include "src/display.hpp"
-
-#include "fatfs.h"
+#include "src/MIDI.hpp"
 
 // for convenience
 
@@ -50,41 +49,11 @@ int chordRootIndex = 0;
 Chord *targetChord;
 array<float, 12> targetScale;
 
-int activeNotes [4];
-
 float jazzAmountCh1 = 0.5;
 float jazzAmountCh2 = 0.5;
 
 float note1QuantizedVoltage = 0.0;
 float note2QuantizedVoltage = 0.0;
-
-// --- Functions --- //
-
-void MIDISendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
-    uint8_t data[3] = { 0 };
-    
-    data[0] = (channel & 0x0F) + 0x90;  // limit channel byte, add status byte
-    data[1] = note & 0x7F;              // remove MSB on data
-    data[2] = velocity & 0x7F;
-
-    patch.midi.SendMessage(data, 3);
-};
-
-void MIDISendNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
-    uint8_t data[3] = { 0 };
-
-    data[0] = (channel & 0x0F) + 0x80;  // limit channel byte, add status byte
-    data[1] = note & 0x7F;              // remove MSB on data
-    data[2] = velocity & 0x7F;
-
-    patch.midi.SendMessage(data, 3);
-}
-
-void clearMidi() {
-    for (int i = 0; i < 4; i++){
-        MIDISendNoteOff(0, activeNotes[i], 100);
-    }
-}
 
 void UpdateControls();
 void UpdateOled();
@@ -269,8 +238,7 @@ void Process()
                 if (i > 0) {
                     targetMidiNote = targetMidiNote + 12;
                 }
-                activeNotes[i] = targetMidiNote;
-                MIDISendNoteOn(0, targetMidiNote, 100);
+                MIDISendNoteOn(0, targetMidiNote, 100, i);
             }
         }
     }
