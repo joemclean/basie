@@ -1,22 +1,22 @@
-# Sequencer
+# Basie
 
 ## Author
-
-Ben Sergentanis
+Joe McLean
 
 ## Description
-5 Step Sequencer with gate and step outputs.
-
-[Source Code](https://github.com/electro-smith/DaisyExamples/tree/master/patch/Sequencer)
+A Eurorack module built on the Daisy platform, designed to create generative modular patches over jazz chord progressions. Load chord sequences from an SD card. Use a clock signal to advance through chords, output as MIDI notes. A two-channel quantizer follows the chord progression, "snapping" input notes to harmonically compatible notes at a strength you choose. Quanitzation strength is also CV controllable.
 
 ## Controls
 
 | Control | Description | Comment |
 | --- | --- | --- |
-| Gate Ins | Advance Sequence | Try using both ins at the same time! |
-| Gate Out | Trigger Out | Triggers when entering an active step. X indicates active |
-| CV Outs | Step Out | OLED value is in terms of percent. So 35 indicates .35 * 5 = 1.75 Volts |
-| Encoder | Navigate Menu | Turn to move through steps. Press to enter/leave submenu (values), or activate/deactive step |
-
-
-
+| Gate In 1 | Advance Sequence | Recieves a clock pulse and adances the sequence by 1 step |
+| Gate In 1 | Reset sequence | Resets sequence to the beginning |
+| CV 1 | V/OCT Quantizer 1 in | Input a note signal to be quantized to the current chord. |
+| CV 2 | V/OCT Quantizer 2 in | Input a second note signal to be quantized to the current chord. |
+| CV 3 | Quantizer 1 Jazz amount | Control quantizer strength. Low values = root note only, mid values = chord tones, high values = chromatic. CV controllable. |
+| CV 4 | V/OCT Quantizer 2 in | Same but for quantizer 2 |
+| MIDI out | CHord porgression MIDI out | Outputs 1st, 3rd, 5th, and 7th up the current chord as MIDI notes on each beat. |
+| Hold + turn encoder | Switch tabs | Switch between the file list and the sequence display |
+| Turn encoder (file list only) | Navigate files | Scroll up and down in file list |
+| Press encoder (file list only) | Load file | Load the current file indicated by the cursor |
