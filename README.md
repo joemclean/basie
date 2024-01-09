@@ -10,7 +10,7 @@ A Eurorack module built on the Daisy platform, designed to create generative mod
 
 | Control | Description | Comment |
 | --- | --- | --- |
-| **Gate In 1** | Advance Sequence | Recieves a clock pulse and adances the sequence by 1 step |
+| **Gate In 1** | Advance Sequence | Recieves a clock pulse and advances the sequence by 1 step |
 | **Gate In 2** | Reset | Resets sequence to the beginning |
 | **CV 1** | Quantizer 1 in | Input a note signal to be quantized to the current chord. |
 | **CV 2** | Quantizer 2 in | Input a second note signal to be quantized to the current chord. |
