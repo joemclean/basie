@@ -1,4 +1,3 @@
-#include "daisysp.h"
 #include "daisy_patch.h"
 
 #include "src/theory.hpp"
@@ -13,11 +12,7 @@ using std::string;
 using std::vector;
 using std::pair;
 
-using namespace daisy;
-using namespace daisysp;
-
-DaisyPatch patch;
-static DaisyPatch hw;
+daisy::DaisyPatch patch;
 
 // --- System variables --- //
 
@@ -209,8 +204,8 @@ void Process()
     // Quantize input to output
     targetScale = targetChord->chordScale;
 
-    jazzAmountCh1 = patch.GetKnobValue((DaisyPatch::Ctrl)2) * 1.f;
-    jazzAmountCh2 = patch.GetKnobValue((DaisyPatch::Ctrl)3) * 1.f;
+    jazzAmountCh1 = patch.GetKnobValue((daisy::DaisyPatch::Ctrl)2) * 1.f;
+    jazzAmountCh2 = patch.GetKnobValue((daisy::DaisyPatch::Ctrl)3) * 1.f;
 
     if (jazzAmountCh1 > 1) jazzAmountCh1 = 1;
     if (jazzAmountCh1 < 0) jazzAmountCh1 = 0;
@@ -219,8 +214,8 @@ void Process()
     if (jazzAmountCh2 < 0) jazzAmountCh2 = 0;
 
     // Read quantizer ins
-    float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 5.f;
-    float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 5.f;
+    float voice1Voltage = patch.GetKnobValue((daisy::DaisyPatch::Ctrl)0) * 5.f;
+    float voice2Voltage = patch.GetKnobValue((daisy::DaisyPatch::Ctrl)1) * 5.f;
 
     // Quantize the inputs to active notes in the target scale
     float chordRootOffsetVoltage = (float)chordRootIndex / 12.0;
@@ -258,8 +253,8 @@ void UpdateOled()
 
         int ch2XOffset = 50;
 
-        drawKeyboard(targetScale, targetScaleSize, jazzAmountCh1, chordRootIndex, 0, 30);
-        drawKeyboard(targetScale, targetScaleSize, jazzAmountCh2, chordRootIndex, ch2XOffset, 30);
+        Display::drawKeyboard(targetScale, targetScaleSize, jazzAmountCh1, chordRootIndex, 0, 30);
+        Display::drawKeyboard(targetScale, targetScaleSize, jazzAmountCh2, chordRootIndex, ch2XOffset, 30);
     } else if (displayTabIndex == 1) {
         string headerStr = "File browser";
         patch.display.SetCursor(0, 0);
@@ -290,8 +285,8 @@ void UpdateOled()
 
 void UpdateOutputs()
 {
-    patch.seed.dac.WriteValue(DacHandle::Channel::ONE,
+    patch.seed.dac.WriteValue(daisy::DacHandle::Channel::ONE,
                               note1QuantizedVoltage * 819.2f);
-    patch.seed.dac.WriteValue(DacHandle::Channel::TWO,
+    patch.seed.dac.WriteValue(daisy::DacHandle::Channel::TWO,
                               note2QuantizedVoltage * 819.2f);
 }
