@@ -7,14 +7,18 @@
 using std::string;
 using std::vector;
 
-void initSDCard();
+namespace SDHandler {
 
-vector<string> listTxtFiles(const char* path);
+  void initSDCard();
 
-string loadChordsFromFile(string filePath);
+  vector<string> listTxtFiles(const char* path);
 
-string trim(const string& str);
+  string loadChordsFromFile(string filePath);
 
-vector<string> parseChords(const string& chordString);
+  string trim(const string& str);
+
+  vector<string> parseChords(const string& chordString);
+
+}
 
 #endif

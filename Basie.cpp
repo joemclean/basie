@@ -6,12 +6,6 @@
 #include "src/display.hpp"
 #include "src/MIDI.hpp"
 
-// for convenience
-using std::array;
-using std::string;
-using std::vector;
-using std::pair;
-
 daisy::DaisyPatch patch;
 
 // --- System variables --- //
@@ -40,7 +34,7 @@ bool beatChanging = false;
 int chordType = 0;
 int chordRootIndex = 0;
 
-Chord *targetChord;
+Theory::Chord *targetChord;
 array<float, 12> targetScale;
 
 float jazzAmountCh1 = 0.5;
@@ -56,9 +50,9 @@ void UpdateOutputs();
 
 void loadSong(const string& fileName) 
 {
-    clearMidi();
-    string fileChords = loadChordsFromFile(fileName);
-    currentSongChords = parseChords(fileChords);
+    MIDI::clearMidi();
+    string fileChords = SDHandler::loadChordsFromFile(fileName);
+    currentSongChords = SDHandler::parseChords(fileChords);
     displayLineOne = fileName;
     playhead = 0;
 }
@@ -113,8 +107,8 @@ int main(void)
     patch.Init(); // Initialize hardware (daisy seed, and patch)
     patch.StartAdc();
 
-    initSDCard();
-    fileList = listTxtFiles("/");
+    SDHandler::initSDCard();
+    fileList = SDHandler::listTxtFiles("/");
     loadSong(fileList[0]);
 
     while(1)
@@ -162,24 +156,25 @@ void Process()
     chordType = chordTypeBuffer;
 
     for (int i = 0; i < 12; i++) {
-        if (chordRoot == noteDisplayNames[i])
+        if (chordRoot == Theory::noteDisplayNames[i])
         {
             chordRootIndex = i;
         }
     }
 
     // Match the current progression chord against available chords
-    targetChord = chordList[0]; // initialize with default
-    for (size_t i = 0; i < chordList.size(); i++) {
-        if (chordList[i]->displayName == chordType) {
-            targetChord = chordList[i];
+    std::array<Theory::Chord*, Theory::chordList.size()> availableChordList = Theory::chordList;
+    targetChord = availableChordList[0]; // initialize with default
+    for (size_t i = 0; i < availableChordList.size(); i++) {
+        if (availableChordList[i]->displayName == chordType) {
+            targetChord = availableChordList[i];
         }
     }
 
     // Iterate over active chord tones and output as MIDI notes
     int chordToneCount = targetChord->tones.size();
     if (beatChanging) {
-        clearMidi();
+        MIDI::clearMidi();
         for (int i = 0; i < chordToneCount; i++)
         {   
             int chordTone = targetChord->tones[i];  
@@ -190,13 +185,13 @@ void Process()
                 if (i > 0) {
                     targetMidiNote = targetMidiNote + 12;
                 }
-                MIDISendNoteOn(0, targetMidiNote, 100, i);
+                MIDI::MIDISendNoteOn(0, targetMidiNote, 100, i);
             }
         }
     }
 
     // Update the display with human names for the current chord
-    chordDisplay = noteDisplayNames[chordRootIndex] + targetChord->displayName;
+    chordDisplay = Theory::noteDisplayNames[chordRootIndex] + targetChord->displayName;
 
     displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
     displayLineThree = chordDisplay; 
@@ -219,8 +214,8 @@ void Process()
 
     // Quantize the inputs to active notes in the target scale
     float chordRootOffsetVoltage = (float)chordRootIndex / 12.0;
-    pair<float, int> values1 = quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh1);
-    pair<float, int> values2 = quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh2);
+    std::pair<float, int> values1 = Quantizer::quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh1);
+    std::pair<float, int> values2 = Quantizer::quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh2);
 
     note1QuantizedVoltage = values1.first;
     note2QuantizedVoltage = values2.first;
