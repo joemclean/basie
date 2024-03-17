@@ -16,14 +16,11 @@ int fileListCursor = 0;
 int loadedFileIndex = 0;
 int fileListPageIndex = 0;
 
-string displayLineOne = "";
-string displayLineTwo = "";
-string displayLineThree = "";
-string chordDisplay;
-
 int displayTabIndex = 0;
 bool encoderIsHeld = false;
 bool tabChangeInProcess = false;
+
+string chordDisplay;
 
 // Module state variables
 vector<string> currentSongChords;
@@ -53,7 +50,7 @@ void loadSong(const string& fileName)
     MIDI::clearMidi();
     string fileChords = SDHandler::loadChordsFromFile(fileName);
     currentSongChords = SDHandler::parseChords(fileChords);
-    displayLineOne = fileName;
+    Display::displayLineOne = fileName;
     playhead = 0;
 }
 
@@ -193,8 +190,9 @@ void Process()
     // Update the display with human names for the current chord
     chordDisplay = Theory::noteDisplayNames[chordRootIndex] + targetChord->displayName;
 
-    displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
-    displayLineThree = chordDisplay; 
+    Display::displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
+    Display::displayLineThree = chordDisplay; 
+
 
     // Quantize input to output
     targetScale = targetChord->chordScale;
@@ -228,28 +226,12 @@ void UpdateOled()
     patch.display.Fill(false);
     if (displayTabIndex == 0) 
     {
-        string str  = displayLineOne;
-        char*       cstr = &str[0];
-
-        patch.display.SetCursor(0, 0);
-        patch.display.WriteString(cstr, Font_7x10, true);
-
-        patch.display.SetCursor(0, 10);
-        str = displayLineTwo;
-        patch.display.WriteString(cstr, Font_7x10, true);
-
-        patch.display.SetCursor(0, 20);
-        str = displayLineThree;
-        patch.display.WriteString(cstr, Font_7x10, true);
-
-        patch.display.SetCursor(0, 30);
-
-        size_t targetScaleSize = targetScale.size();
-
-        int ch2XOffset = 50;
-
-        Display::drawKeyboard(targetScale, targetScaleSize, jazzAmountCh1, chordRootIndex, 0, 30);
-        Display::drawKeyboard(targetScale, targetScaleSize, jazzAmountCh2, chordRootIndex, ch2XOffset, 30);
+        Display::renderSongView(
+            jazzAmountCh1,
+            jazzAmountCh2,
+            chordRootIndex,
+            targetScale
+        );
     } else if (displayTabIndex == 1) {
         string headerStr = "File browser";
         patch.display.SetCursor(0, 0);
