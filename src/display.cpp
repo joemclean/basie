@@ -15,6 +15,9 @@ namespace Display {
   std::string displayLineTwo = "";
   std::string displayLineThree = "";
 
+  int fileListCursor = 0;
+  int fileListPageIndex = 0;
+
   void drawKeyboard(
     const array<float, 12>& targetScale,
     size_t& targetScaleSize, 
@@ -98,5 +101,33 @@ namespace Display {
 
     Display::drawKeyboard(targetScale, targetScaleSize, jazzAmountCh1, chordRootIndex, 0, 30);
     Display::drawKeyboard(targetScale, targetScaleSize, jazzAmountCh2, chordRootIndex, ch2XOffset, 30);
+  }
+
+  void renderFileBrowser(
+    const std::vector<std::string>& fileList,
+    const int& loadedFileIndex
+  ) {
+    string headerStr = "File browser";
+    patch.display.SetCursor(0, 0);
+    patch.display.WriteString(headerStr.c_str(), Font_7x10, true);
+
+    int filesPerPage = 5;
+    fileListPageIndex = (int)fileListCursor / filesPerPage ;
+    int lowerPageBound = fileListPageIndex * filesPerPage ;
+    int fileListLength = static_cast<int>(fileList.size());
+
+    int upperPageBound = (fileListPageIndex + 1) * filesPerPage;
+    if (upperPageBound > fileListLength) {
+      upperPageBound = fileListLength;
+    }
+
+    for (int i = lowerPageBound; i < upperPageBound; i++ ) {
+      patch.display.SetCursor(0, (i + 1 - (filesPerPage * fileListPageIndex)) * 10);
+      string fileStr;
+      fileListCursor == i ? fileStr += ">" : fileStr += " ";
+      loadedFileIndex == i ? fileStr += "*" : fileStr += " ";
+      fileStr += fileList[i];
+      patch.display.WriteString(fileStr.c_str(), Font_7x10, true);
+    }
   }
 }

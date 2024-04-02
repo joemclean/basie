@@ -3,6 +3,7 @@
 
 #include <array>
 #include <string>
+#include <vector>
 
 namespace Display {
 
@@ -10,6 +11,8 @@ namespace Display {
   extern std::string displayLineTwo;
   extern std::string displayLineThree;
   extern std::string chordDisplay;
+
+  extern int fileListCursor;
 
   void drawKeyboard(
     const std::array<float, 12>& targetScale, 
@@ -25,6 +28,11 @@ namespace Display {
     const float& jazzAmountCh2,
     const int& chordRootIndex,
     std::array<float, 12>& targetScale
+  );
+
+  void renderFileBrowser(
+    const std::vector<std::string>& fileList,
+    const int loadedFileIndex
   );
 }
 

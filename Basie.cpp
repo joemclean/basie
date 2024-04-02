@@ -12,15 +12,13 @@ daisy::DaisyPatch patch;
 
 // Display variables
 vector<string> fileList;
-int fileListCursor = 0;
 int loadedFileIndex = 0;
-int fileListPageIndex = 0;
 
 int displayTabIndex = 0;
 bool encoderIsHeld = false;
 bool tabChangeInProcess = false;
 
-string chordDisplay;
+string chordDisplayName;
 
 // Module state variables
 vector<string> currentSongChords;
@@ -60,8 +58,8 @@ void ProcessEncoder() {
   if (patch.encoder.FallingEdge()) {
     encoderIsHeld = false;
     if (!tabChangeInProcess && displayTabIndex == 1) {
-      loadSong(fileList[fileListCursor]);
-      loadedFileIndex = fileListCursor;
+      loadSong(fileList[Display::fileListCursor]);
+      loadedFileIndex = Display::fileListCursor;
     }
     tabChangeInProcess = false;
   }
@@ -75,13 +73,13 @@ void ProcessEncoder() {
     } else {
       // Navigate file system
       int fileListSize = static_cast<int>(fileList.size());
-      fileListCursor += increment;
+      Display::fileListCursor += increment;
 
       // Wrap around logic
-      if (fileListCursor >= fileListSize) {
-        fileListCursor = 0;
-      } else if (fileListCursor < 0) {
-        fileListCursor = fileListSize > 0 ? fileListSize - 1 : 0;
+      if (Display::fileListCursor >= fileListSize) {
+        Display::fileListCursor = 0;
+      } else if (Display::fileListCursor < 0) {
+        Display::fileListCursor = fileListSize > 0 ? fileListSize - 1 : 0;
       }
     }
   }
@@ -176,10 +174,10 @@ void Process() {
   }
 
   // Update the display with human names for the current chord
-  chordDisplay = Theory::noteDisplayNames[chordRootIndex] + targetChord->displayName;
+  chordDisplayName = Theory::noteDisplayNames[chordRootIndex] + targetChord->displayName;
 
   Display::displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
-  Display::displayLineThree = chordDisplay; 
+  Display::displayLineThree = chordDisplayName; 
 
 
   // Quantize input to output
@@ -219,28 +217,10 @@ void UpdateOled() {
     targetScale
   );
   } else if (displayTabIndex == 1) {
-    string headerStr = "File browser";
-    patch.display.SetCursor(0, 0);
-    patch.display.WriteString(headerStr.c_str(), Font_7x10, true);
-
-    int filesPerPage = 5;
-    fileListPageIndex = (int)fileListCursor / filesPerPage ;
-    int lowerPageBound = fileListPageIndex * filesPerPage ;
-    int fileListLength = static_cast<int>(fileList.size());
-
-    int upperPageBound = (fileListPageIndex + 1) * filesPerPage;
-    if (upperPageBound > fileListLength) {
-      upperPageBound = fileListLength;
-    }
-
-    for (int i = lowerPageBound; i < upperPageBound; i++ ) {
-      patch.display.SetCursor(0, (i + 1 - (filesPerPage * fileListPageIndex)) * 10);
-      string fileStr;
-      fileListCursor == i ? fileStr += ">" : fileStr += " ";
-      loadedFileIndex == i ? fileStr += "*" : fileStr += " ";
-      fileStr += fileList[i];
-      patch.display.WriteString(fileStr.c_str(), Font_7x10, true);
-    }
+    Display::renderFileBrowser(
+      fileList,
+      loadedFileIndex
+    );
   }
   patch.display.Update();
 }
