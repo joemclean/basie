@@ -32,7 +32,7 @@ namespace Display {
 
   void renderFileBrowser(
     const std::vector<std::string>& fileList,
-    const int loadedFileIndex
+    const int& loadedFileIndex
   );
 }
 

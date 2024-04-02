@@ -23,7 +23,8 @@ namespace Theory {
   };
 
   extern array<Chord *, 14> chordList;
-  extern array<string, 12> noteDisplayNames;
+  extern array<string, 12> noteNamesSharps;
+  extern array<string, 12> noteNamesFlats;
 }
 
 #endif

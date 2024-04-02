@@ -46,9 +46,9 @@ namespace Theory {
   Theory::Chord *dominantSharp11chord = new Theory::Chord({0, 4, 7, 10, 14, 18, 21}, "7#11", lydianDominantScale);
   Theory::Chord *flat13chord = new Theory::Chord({0, 4, 7, 10, 14, 17, 20}, "7b13", mixolydianFlat13Scale);
   Theory::Chord *augmentedChord = new Theory::Chord({0, 4, 8, 10, 14, 17, 21}, "aug", augmentedScale);
-
-  // TODO OOPS DOESN'T WORK W SHARPS :(
-  array<string, 12> noteDisplayNames = {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
+  
+  array<string, 12> noteNamesFlats = {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
+  array<string, 12> noteNamesSharps = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
   array<Theory::Chord *, 14> chordList = {majorChord, minorChord, major6Chord, minor6Chord, dominantChord, halfDiminishedChord, diminishedChord, flat9chord, sharp9chord, sharp11chord, dominantSharp11chord, flat13chord, augmentedChord };
 }

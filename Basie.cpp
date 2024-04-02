@@ -122,8 +122,13 @@ void Process() {
     playhead = 0;
   }
 
-  // TODO - only bother processing all of this if the playhead advances
+    // TODO - only bother processing all of this if the playhead advances
   string chordString = currentSongChords[playhead];
+
+  Display::displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
+  Display::displayLineThree = chordString;
+
+  // Parse the chord string
 
   string chordRoot = "C";
   string chordType = "maj7";
@@ -137,17 +142,17 @@ void Process() {
   strcpy(chordRootBuffer, strtok(chordBuffer, " "));
   strcpy(chordTypeBuffer, strtok(NULL, " "));
 
-  // Prepare the chord and scale based on the chord type
   chordRoot = chordRootBuffer;
   chordType = chordTypeBuffer;
 
+  // Match the root
   for (int i = 0; i < 12; i++) {
-    if (chordRoot == Theory::noteDisplayNames[i]) {
+    if (chordRoot == Theory::noteNamesFlats[i] || chordRoot == Theory::noteNamesSharps[i]) {
       chordRootIndex = i;
     }
   }
 
-  // Match the current progression chord against available chords
+  // Match the chord type
   std::array<Theory::Chord*, Theory::chordList.size()> availableChordList = Theory::chordList;
   targetChord = availableChordList[0]; // initialize with default
   for (size_t i = 0; i < availableChordList.size(); i++) {
@@ -172,14 +177,7 @@ void Process() {
       }
     }
   }
-
-  // Update the display with human names for the current chord
-  chordDisplayName = Theory::noteDisplayNames[chordRootIndex] + targetChord->displayName;
-
-  Display::displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
-  Display::displayLineThree = chordDisplayName; 
-
-
+  
   // Quantize input to output
   targetScale = targetChord->chordScale;
 
