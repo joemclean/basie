@@ -1,3 +1,4 @@
+#include "daisysp.h"
 #include "daisy_patch.h"
 
 #include "src/theory.hpp"
@@ -6,7 +7,10 @@
 #include "src/display.hpp"
 #include "src/MIDI.hpp"
 
-daisy::DaisyPatch patch;
+using namespace daisy;
+using namespace daisysp;
+
+DaisyPatch patch;
 
 // --- System variables --- //
 
@@ -91,11 +95,79 @@ void UpdateControls() {
   ProcessEncoder();
 }
 
+Oscillator osc[3];
+
+std::string waveNames[5];
+
+int waveform;
+int final_wave;
+
+float testval;
+
+void SetupOsc(float samplerate)
+{
+    for(int i = 0; i < 3; i++)
+    {
+        osc[i].Init(samplerate);
+        osc[i].SetAmp(.7);
+    }
+}
+
+void SetupWaveNames()
+{
+    waveNames[0] = "sine";
+    waveNames[1] = "triangle";
+    waveNames[2] = "saw";
+    waveNames[3] = "ramp";
+    waveNames[4] = "square";
+}
+
+static void AudioCallback(AudioHandle::InputBuffer  in,
+                          AudioHandle::OutputBuffer out,
+                          size_t                    size)
+{
+    for(size_t i = 0; i < size; i++)
+    {
+        float mix = 0;
+        //Process and output the three oscillators
+        for(size_t chn = 0; chn < 3; chn++)
+        {
+            float sig = osc[chn].Process();
+            mix += sig * .25f;
+            out[chn][i] = sig;
+        }
+
+        // output the mixed oscillators
+        out[3][i] = mix;
+    }
+}
+
 // --- Implementation --- //
 
 int main(void) {
-  patch.Init(); // Initialize hardware (daisy seed, and patch)
-  patch.StartAdc();
+    float samplerate;
+    patch.Init(); // Initialize hardware (daisy seed, and patch)
+    samplerate = patch.AudioSampleRate();
+
+    waveform   = 2;
+    final_wave = Oscillator::WAVE_POLYBLEP_TRI;
+
+    SetupOsc(samplerate);
+    SetupWaveNames();
+
+    testval = 0.f;
+
+    patch.StartAdc();
+    patch.StartAudio(AudioCallback);
+
+    for(int i = 0; i < 3; i++)
+    {
+        osc[i].SetFreq(440);
+        osc[i].SetWaveform((uint8_t)waveform);
+    }
+
+  // start callback
+  patch.StartAudio(AudioCallback);
 
   SDHandler::initSDCard();
   fileList = SDHandler::listTxtFiles("/");
@@ -169,11 +241,15 @@ void Process() {
       int chordTone = targetChord->tones[i];  
       // Migration TODO: Reimplement voicing type
       int targetMidiNote = 36 + chordRootIndex + chordTone;
+      MIDI::MIDISendNoteOn(0, targetMidiNote, 100, i);
       if (i < 4) {
         if (i > 0) {
           targetMidiNote = targetMidiNote + 12;
         }
         MIDI::MIDISendNoteOn(0, targetMidiNote, 100, i);
+      }
+      if (i < 3){
+        osc[i].SetFreq(mtof(targetMidiNote));
       }
     }
   }
@@ -181,8 +257,8 @@ void Process() {
   // Quantize input to output
   targetScale = targetChord->chordScale;
 
-  jazzAmountCh1 = patch.GetKnobValue((daisy::DaisyPatch::Ctrl)2) * 1.f;
-  jazzAmountCh2 = patch.GetKnobValue((daisy::DaisyPatch::Ctrl)3) * 1.f;
+  jazzAmountCh1 = patch.GetKnobValue((DaisyPatch::Ctrl)2) * 1.f;
+  jazzAmountCh2 = patch.GetKnobValue((DaisyPatch::Ctrl)3) * 1.f;
 
   if (jazzAmountCh1 > 1) jazzAmountCh1 = 1;
   if (jazzAmountCh1 < 0) jazzAmountCh1 = 0;
@@ -191,8 +267,8 @@ void Process() {
   if (jazzAmountCh2 < 0) jazzAmountCh2 = 0;
 
   // Read quantizer ins
-  float voice1Voltage = patch.GetKnobValue((daisy::DaisyPatch::Ctrl)0) * 5.f;
-  float voice2Voltage = patch.GetKnobValue((daisy::DaisyPatch::Ctrl)1) * 5.f;
+  float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 5.f;
+  float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 5.f;
 
   // Quantize the inputs to active notes in the target scale
   float chordRootOffsetVoltage = (float)chordRootIndex / 12.0;
@@ -224,6 +300,6 @@ void UpdateOled() {
 }
 
 void UpdateOutputs() {
-  patch.seed.dac.WriteValue(daisy::DacHandle::Channel::ONE, note1QuantizedVoltage * 819.2f);
-  patch.seed.dac.WriteValue(daisy::DacHandle::Channel::TWO, note2QuantizedVoltage * 819.2f);
+  patch.seed.dac.WriteValue(DacHandle::Channel::ONE, note1QuantizedVoltage * 819.2f);
+  patch.seed.dac.WriteValue(DacHandle::Channel::TWO, note2QuantizedVoltage * 819.2f);
 }
