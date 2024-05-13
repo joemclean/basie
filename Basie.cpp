@@ -15,17 +15,20 @@ DaisyPatch patch;
 // --- System variables --- //
 
 // Display variables
-vector<string> fileList;
+vector<string> fileList = {};
 int loadedFileIndex = 0;
 
 int displayTabIndex = 0;
 bool encoderIsHeld = false;
 bool tabChangeInProcess = false;
 
-string chordDisplayName;
+string chordDisplayName = "No chord";
+string currentFileName = "No file";
+
+int fileListCursor = 0;
 
 // Module state variables
-vector<string> currentSongChords;
+vector<string> currentSongChords = {};
 int playhead = 0;
 
 bool beatChanging = false;
@@ -34,7 +37,7 @@ int chordType = 0;
 int chordRootIndex = 0;
 
 Theory::Chord *targetChord;
-array<float, 12> targetScale;
+array<float, 12> targetScale = Theory::chordList[0]->chordScale;
 
 float jazzAmountCh1 = 0.5;
 float jazzAmountCh2 = 0.5;
@@ -51,7 +54,7 @@ void loadSong(const string& fileName) {
   MIDI::clearMidi();
   string fileChords = SDHandler::loadChordsFromFile(fileName);
   currentSongChords = SDHandler::parseChords(fileChords);
-  Display::displayLineOne = fileName;
+  currentFileName = fileName;
   playhead = 0;
 }
 
@@ -62,8 +65,8 @@ void ProcessEncoder() {
   if (patch.encoder.FallingEdge()) {
     encoderIsHeld = false;
     if (!tabChangeInProcess && displayTabIndex == 1) {
-      loadSong(fileList[Display::fileListCursor]);
-      loadedFileIndex = Display::fileListCursor;
+      loadSong(fileList[fileListCursor]);
+      loadedFileIndex = fileListCursor;
     }
     tabChangeInProcess = false;
   }
@@ -77,13 +80,13 @@ void ProcessEncoder() {
     } else {
       // Navigate file system
       int fileListSize = static_cast<int>(fileList.size());
-      Display::fileListCursor += increment;
+      fileListCursor += increment;
 
       // Wrap around logic
-      if (Display::fileListCursor >= fileListSize) {
-        Display::fileListCursor = 0;
-      } else if (Display::fileListCursor < 0) {
-        Display::fileListCursor = fileListSize > 0 ? fileListSize - 1 : 0;
+      if (fileListCursor >= fileListSize) {
+        fileListCursor = 0;
+      } else if (fileListCursor < 0) {
+        fileListCursor = fileListSize > 0 ? fileListSize - 1 : 0;
       }
     }
   }
@@ -97,11 +100,6 @@ void UpdateControls() {
 
 Oscillator osc[3];
 
-std::string waveNames[5];
-
-int waveform;
-int final_wave;
-
 float testval;
 
 void SetupOsc(float samplerate)
@@ -111,15 +109,6 @@ void SetupOsc(float samplerate)
         osc[i].Init(samplerate);
         osc[i].SetAmp(.7);
     }
-}
-
-void SetupWaveNames()
-{
-    waveNames[0] = "sine";
-    waveNames[1] = "triangle";
-    waveNames[2] = "saw";
-    waveNames[3] = "ramp";
-    waveNames[4] = "square";
 }
 
 static void AudioCallback(AudioHandle::InputBuffer  in,
@@ -149,11 +138,7 @@ int main(void) {
     patch.Init(); // Initialize hardware (daisy seed, and patch)
     samplerate = patch.AudioSampleRate();
 
-    waveform   = 2;
-    final_wave = Oscillator::WAVE_POLYBLEP_TRI;
-
     SetupOsc(samplerate);
-    SetupWaveNames();
 
     testval = 0.f;
 
@@ -163,7 +148,7 @@ int main(void) {
     for(int i = 0; i < 3; i++)
     {
         osc[i].SetFreq(440);
-        osc[i].SetWaveform((uint8_t)waveform);
+        osc[i].SetWaveform(0);
     }
 
   // start callback
@@ -197,8 +182,8 @@ void Process() {
     // TODO - only bother processing all of this if the playhead advances
   string chordString = currentSongChords[playhead];
 
-  Display::displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
-  Display::displayLineThree = chordString;
+  // TODO fix progress tracker Display::displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
+  chordDisplayName = chordString;
 
   // Parse the chord string
 
@@ -249,7 +234,8 @@ void Process() {
         MIDI::MIDISendNoteOn(0, targetMidiNote, 100, i);
       }
       if (i < 3){
-        osc[i].SetFreq(mtof(targetMidiNote));
+        float detune = i * 0.1f;
+        osc[i].SetFreq(mtof(targetMidiNote) - detune);
       }
     }
   }
@@ -285,6 +271,10 @@ void UpdateOled() {
   patch.display.Fill(false);
   if (displayTabIndex == 0) {
     Display::renderSongView(
+    currentFileName,
+    chordDisplayName,
+    playhead,
+    playhead,
     jazzAmountCh1,
     jazzAmountCh2,
     chordRootIndex,
@@ -293,7 +283,8 @@ void UpdateOled() {
   } else if (displayTabIndex == 1) {
     Display::renderFileBrowser(
       fileList,
-      loadedFileIndex
+      loadedFileIndex,
+      fileListCursor
     );
   }
   patch.display.Update();

@@ -11,11 +11,6 @@ extern DaisyPatch patch;
 
 namespace Display {
 
-  std::string displayLineOne = "";
-  std::string displayLineTwo = "";
-  std::string displayLineThree = "";
-
-  int fileListCursor = 0;
   int fileListPageIndex = 0;
 
   void drawKeyboard(
@@ -74,23 +69,27 @@ namespace Display {
   }
 
   void renderSongView(
+    const string& songName,
+    const string& targetChord,
+    const int& playhead,
+    const int& songLength,
     const float& jazzAmountCh1, 
     const float& jazzAmountCh2,
     const int& chordRootIndex,
     array<float, 12>& targetScale
   ) {
-    string str = displayLineOne;
+    string str = songName;
     char* cstr = &str[0];
 
     patch.display.SetCursor(0, 0);
     patch.display.WriteString(cstr, Font_7x10, true);
 
     patch.display.SetCursor(0, 10);
-    str = displayLineTwo;
+    str = targetChord;
     patch.display.WriteString(cstr, Font_7x10, true);
 
     patch.display.SetCursor(0, 20);
-    str = displayLineThree;
+    str = targetChord;
     patch.display.WriteString(cstr, Font_7x10, true);
 
     patch.display.SetCursor(0, 30);
@@ -105,7 +104,8 @@ namespace Display {
 
   void renderFileBrowser(
     const std::vector<std::string>& fileList,
-    const int& loadedFileIndex
+    const int& loadedFileIndex,
+    const int& fileListCursor
   ) {
     string headerStr = "File browser";
     patch.display.SetCursor(0, 0);

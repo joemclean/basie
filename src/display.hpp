@@ -7,13 +7,6 @@
 
 namespace Display {
 
-  extern std::string displayLineOne;
-  extern std::string displayLineTwo;
-  extern std::string displayLineThree;
-  extern std::string chordDisplay;
-
-  extern int fileListCursor;
-
   void drawKeyboard(
     const std::array<float, 12>& targetScale, 
     size_t& targetScaleSize, 
@@ -24,6 +17,10 @@ namespace Display {
   );
 
   void renderSongView(
+    const std::string& songName,
+    const std::string& targetChord,
+    const int& playhead,
+    const int& songLength,
     const float& jazzAmountCh1, 
     const float& jazzAmountCh2,
     const int& chordRootIndex,
@@ -32,7 +29,8 @@ namespace Display {
 
   void renderFileBrowser(
     const std::vector<std::string>& fileList,
-    const int& loadedFileIndex
+    const int& loadedFileIndex,
+    const int& fileListCursor
   );
 }
 
