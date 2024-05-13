@@ -15,13 +15,13 @@ namespace Display {
 
   void drawKeyboard(
     const array<float, 12>& targetScale,
-    size_t& targetScaleSize, 
     const float& jazzAmount, 
     const int& chordRootIndex,
+    const int& targetNoteIndex,
     const int& x_origin,
     const int& y_origin
   ) {
-    bool shouldFill = false;
+    bool shouldFillKey = false;
     int whiteKeyIndex = 0;
     int blackKeyIndex = 0;
 
@@ -30,36 +30,52 @@ namespace Display {
     int blackKeyOffset = 3;
     int keyGap = 2;
 
-    for (size_t i = 0; i < targetScaleSize; i++) {
+    for (size_t i = 0; i < targetScale.size(); i++) {
       int targetIndex = (i + 12 - chordRootIndex) % 12;
 
       // TODO weirdly inverted?
       // TODO should be set outside (maybe as an array of avil notes)
-      shouldFill = false;
+      shouldFillKey = false;
       if (targetScale[targetIndex] >= (1 - jazzAmount)) {
-        shouldFill = true;
+        shouldFillKey = true;
       }
       // White keys
       if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
         patch.display.DrawRect(
-          x_origin + (whiteKeyIndex * keyWidth), 
+          x_origin + ((whiteKeyIndex * keyWidth) + (2 * whiteKeyIndex)), 
           y_origin + keyHeight + keyGap, 
-          x_origin + (whiteKeyIndex + 1) * keyWidth, 
+          x_origin + ((whiteKeyIndex + 1) * keyWidth) + (2 * whiteKeyIndex), 
           y_origin + (2 * keyHeight) + keyGap, 
           true, 
-          shouldFill
+          shouldFillKey
         );
+        if (i == (targetNoteIndex + chordRootIndex) % 12) {
+          patch.display.DrawCircle(
+            x_origin + (whiteKeyIndex * keyWidth) + (2 * whiteKeyIndex) + (keyWidth / 2), 
+            y_origin + keyHeight + keyGap + (keyHeight / 2), 
+            2, 
+            false
+          );
+        }
         whiteKeyIndex++;
         // Black keys
       } else {
         patch.display.DrawRect(
-          x_origin + (blackKeyIndex * keyWidth + blackKeyOffset), 
+          x_origin + ((blackKeyIndex * keyWidth) + blackKeyOffset + (2 * blackKeyIndex)), 
           y_origin,
-          x_origin + ((blackKeyIndex + 1) * keyWidth) + blackKeyOffset, 
+          x_origin + ((blackKeyIndex + 1) * keyWidth) + blackKeyOffset + (2 * blackKeyIndex), 
           y_origin + keyHeight, 
           true, 
-          shouldFill
+          shouldFillKey
         );
+        if (i == (targetNoteIndex + chordRootIndex) % 12) {
+          patch.display.DrawCircle(
+            x_origin + (blackKeyIndex * keyWidth) + blackKeyOffset + (2 * blackKeyIndex) + (keyWidth / 2), 
+            y_origin + keyHeight / 2, 
+            2, 
+            false
+          );
+        }
         blackKeyIndex++;
       }
       if (i == 4) {
@@ -76,30 +92,28 @@ namespace Display {
     const float& jazzAmountCh1, 
     const float& jazzAmountCh2,
     const int& chordRootIndex,
-    array<float, 12>& targetScale
+    array<float, 12>& targetScale,
+    const int& note1index,
+    const int& note2index
   ) {
     string str = songName;
     char* cstr = &str[0];
 
-    patch.display.SetCursor(0, 0);
-    patch.display.WriteString(cstr, Font_7x10, true);
+    patch.display.SetCursor(2, 0);
+    patch.display.WriteString(cstr, Font_6x8, true);
 
-    patch.display.SetCursor(0, 10);
+    patch.display.SetCursor(2, 10);
     str = targetChord;
-    patch.display.WriteString(cstr, Font_7x10, true);
+    patch.display.WriteString(cstr, Font_6x8, true);
 
-    patch.display.SetCursor(0, 20);
-    str = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(songLength) + ":";
-    patch.display.WriteString(cstr, Font_7x10, true);
+    patch.display.SetCursor(2, 20);
+    str = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(songLength);
+    patch.display.WriteString(cstr, Font_6x8, true);
 
-    patch.display.SetCursor(0, 30);
+    patch.display.SetCursor(2, 30);
 
-    size_t targetScaleSize = targetScale.size();
-
-    int ch2XOffset = 50;
-
-    Display::drawKeyboard(targetScale, targetScaleSize, jazzAmountCh1, chordRootIndex, 0, 30);
-    Display::drawKeyboard(targetScale, targetScaleSize, jazzAmountCh2, chordRootIndex, ch2XOffset, 30);
+    Display::drawKeyboard(targetScale, jazzAmountCh1, chordRootIndex, note1index, 2, 32);
+    Display::drawKeyboard(targetScale, jazzAmountCh2, chordRootIndex, note2index, 72, 32);
   }
 
   void renderFileBrowser(
@@ -109,7 +123,7 @@ namespace Display {
   ) {
     string headerStr = "File browser";
     patch.display.SetCursor(0, 0);
-    patch.display.WriteString(headerStr.c_str(), Font_7x10, true);
+    patch.display.WriteString(headerStr.c_str(), Font_6x8, true);
 
     int filesPerPage = 5;
     fileListPageIndex = (int)fileListCursor / filesPerPage ;
@@ -127,7 +141,7 @@ namespace Display {
       fileListCursor == i ? fileStr += ">" : fileStr += " ";
       loadedFileIndex == i ? fileStr += "*" : fileStr += " ";
       fileStr += fileList[i];
-      patch.display.WriteString(fileStr.c_str(), Font_7x10, true);
+      patch.display.WriteString(fileStr.c_str(), Font_6x8, true);
     }
   }
 }

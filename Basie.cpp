@@ -43,7 +43,9 @@ float jazzAmountCh1 = 0.5;
 float jazzAmountCh2 = 0.5;
 
 float note1QuantizedVoltage = 0.0;
+int note1index = 0;
 float note2QuantizedVoltage = 0.0;
+int note2index = 0;
 
 void UpdateControls();
 void Process();
@@ -261,7 +263,9 @@ void Process() {
   std::pair<float, int> values2 = Quantizer::quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh2);
 
   note1QuantizedVoltage = values1.first;
+  note1index = values1.second;
   note2QuantizedVoltage = values2.first;
+  note2index = values2.second;
 
   beatChanging = false;
 }
@@ -277,7 +281,9 @@ void UpdateOled() {
     jazzAmountCh1,
     jazzAmountCh2,
     chordRootIndex,
-    targetScale
+    targetScale,
+    note1index,
+    note2index
   );
   } else if (displayTabIndex == 1) {
     Display::renderFileBrowser(
