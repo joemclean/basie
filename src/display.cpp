@@ -89,7 +89,7 @@ namespace Display {
     patch.display.WriteString(cstr, Font_7x10, true);
 
     patch.display.SetCursor(0, 20);
-    str = targetChord;
+    str = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(songLength) + ":";
     patch.display.WriteString(cstr, Font_7x10, true);
 
     patch.display.SetCursor(0, 30);

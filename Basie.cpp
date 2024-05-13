@@ -182,7 +182,6 @@ void Process() {
     // TODO - only bother processing all of this if the playhead advances
   string chordString = currentSongChords[playhead];
 
-  // TODO fix progress tracker Display::displayLineTwo = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(currentSongChords.size()) + ":";
   chordDisplayName = chordString;
 
   // Parse the chord string
@@ -274,7 +273,7 @@ void UpdateOled() {
     currentFileName,
     chordDisplayName,
     playhead,
-    playhead,
+    currentSongChords.size(),
     jazzAmountCh1,
     jazzAmountCh2,
     chordRootIndex,
