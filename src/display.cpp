@@ -42,17 +42,17 @@ namespace Display {
       // White keys
       if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
         patch.display.DrawRect(
-          x_origin + ((whiteKeyIndex * keyWidth) + (2 * whiteKeyIndex)), 
+          x_origin + ((whiteKeyIndex * keyWidth) + (keyGap * whiteKeyIndex)), 
           y_origin + keyHeight + keyGap, 
-          x_origin + ((whiteKeyIndex + 1) * keyWidth) + (2 * whiteKeyIndex), 
+          x_origin + ((whiteKeyIndex + 1) * keyWidth) + (keyGap * whiteKeyIndex), 
           y_origin + (2 * keyHeight) + keyGap, 
           true, 
           shouldFillKey
         );
         if (i == (targetNoteIndex + chordRootIndex) % 12) {
           patch.display.DrawCircle(
-            x_origin + (whiteKeyIndex * keyWidth) + (2 * whiteKeyIndex) + (keyWidth / 2), 
-            y_origin + keyHeight + keyGap + (keyHeight / 2), 
+            x_origin + (whiteKeyIndex * keyWidth) + (keyGap * whiteKeyIndex) + (keyWidth / 2), 
+            y_origin + keyHeight + keyGap + (keyHeight / keyGap), 
             2, 
             false
           );
@@ -61,16 +61,16 @@ namespace Display {
         // Black keys
       } else {
         patch.display.DrawRect(
-          x_origin + ((blackKeyIndex * keyWidth) + blackKeyOffset + (2 * blackKeyIndex)), 
+          x_origin + ((blackKeyIndex * keyWidth) + blackKeyOffset + (keyGap * blackKeyIndex)), 
           y_origin,
-          x_origin + ((blackKeyIndex + 1) * keyWidth) + blackKeyOffset + (2 * blackKeyIndex), 
+          x_origin + ((blackKeyIndex + 1) * keyWidth) + blackKeyOffset + (keyGap * blackKeyIndex), 
           y_origin + keyHeight, 
           true, 
           shouldFillKey
         );
         if (i == (targetNoteIndex + chordRootIndex) % 12) {
           patch.display.DrawCircle(
-            x_origin + (blackKeyIndex * keyWidth) + blackKeyOffset + (2 * blackKeyIndex) + (keyWidth / 2), 
+            x_origin + (blackKeyIndex * keyWidth) + blackKeyOffset + (keyGap * blackKeyIndex) + (keyWidth / 2), 
             y_origin + keyHeight / 2, 
             2, 
             false
