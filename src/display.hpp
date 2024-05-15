@@ -25,7 +25,9 @@ namespace Display {
     const int& chordRootIndex,
     std::array<float, 12>& targetScale,
     const int& note1index,
-    const int& note2index
+    const int& note2index,
+    const int& note1Octave,
+    const int& note2Octave
   );
 
   void renderFileBrowser(

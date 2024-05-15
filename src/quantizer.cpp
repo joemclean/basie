@@ -9,25 +9,27 @@ using std::make_pair;
 
 namespace Quantizer {
   pair<float, int> quantizeToScale(
-    const float& noteInVoltage, 
-    const float& chordRootOffsetVoltage, 
+    const float noteInVoltage, 
+    const int chordRootIndex, 
     const array<float, 12>& targetScale, 
-    const float& jazzAmount
+    const float jazzAmount
   ) {
-    float whole, fractional;
+    float octaveVoltage, noteVoltage;
     float jazzThreshold = 1.0 - jazzAmount;
-    whole = floor(noteInVoltage);
-    fractional = noteInVoltage - whole;
-    int nearestScaleToneIndex;
+    // separate the whole voltage (octave) from fractional (note)
+    octaveVoltage = floor(noteInVoltage);
+    noteVoltage = noteInVoltage - octaveVoltage;
+    int nearestScaleToneIndex = 0;
     float currentLowestNoteDistance = 1.0;
+    bool quantizerStepIsActive = false;
+
     for (int i = 0; i < 12; i++) {
-      if ((float)targetScale[i] >= jazzThreshold) {
+      int targetIndex = (i + (12 - chordRootIndex)) % 12;
+      quantizerStepIsActive = (float)targetScale[targetIndex] >= jazzThreshold;
+      if (quantizerStepIsActive) {
         float indexAsFloat = (float)i;
-        float indexAsVoltage = (indexAsFloat/12) + chordRootOffsetVoltage;
-        if (indexAsVoltage > 1.0) {
-          indexAsVoltage = indexAsVoltage - 1;
-        }
-        float noteDistance = abs(indexAsVoltage - fractional);
+        float indexAsVoltage = (indexAsFloat/12);
+        float noteDistance = abs(indexAsVoltage - noteVoltage);
         if (noteDistance < currentLowestNoteDistance) {
           currentLowestNoteDistance = noteDistance;
           nearestScaleToneIndex = i;
@@ -35,7 +37,7 @@ namespace Quantizer {
       }
     }
     float baseNoteVoltage = (float)nearestScaleToneIndex / 12;
-    float targetNoteVoltage = whole + baseNoteVoltage + chordRootOffsetVoltage;
+    float targetNoteVoltage = octaveVoltage + baseNoteVoltage;
     return make_pair(targetNoteVoltage, nearestScaleToneIndex);
   }
 }

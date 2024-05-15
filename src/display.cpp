@@ -31,12 +31,12 @@ namespace Display {
     int keyGap = 2;
 
     for (size_t i = 0; i < targetScale.size(); i++) {
-      int targetIndex = (i + 12 - chordRootIndex) % 12;
+      int rotatedIndex = (i + 12 - chordRootIndex) % 12;
 
       // TODO weirdly inverted?
       // TODO should be set outside (maybe as an array of avil notes)
       shouldFillKey = false;
-      if (targetScale[targetIndex] >= (1 - jazzAmount)) {
+      if (targetScale[rotatedIndex] >= (1 - jazzAmount)) {
         shouldFillKey = true;
       }
       // White keys
@@ -49,7 +49,7 @@ namespace Display {
           true, 
           shouldFillKey
         );
-        if (i == (targetNoteIndex + chordRootIndex) % 12) {
+        if (i == targetNoteIndex) {
           patch.display.DrawCircle(
             x_origin + (whiteKeyIndex * keyWidth) + (keyGap * whiteKeyIndex) + (keyWidth / 2), 
             y_origin + keyHeight + keyGap + (keyHeight / keyGap), 
@@ -68,7 +68,7 @@ namespace Display {
           true, 
           shouldFillKey
         );
-        if (i == (targetNoteIndex + chordRootIndex) % 12) {
+        if (i == targetNoteIndex) {
           patch.display.DrawCircle(
             x_origin + (blackKeyIndex * keyWidth) + blackKeyOffset + (keyGap * blackKeyIndex) + (keyWidth / 2), 
             y_origin + keyHeight / 2, 
@@ -94,26 +94,43 @@ namespace Display {
     const int& chordRootIndex,
     array<float, 12>& targetScale,
     const int& note1index,
-    const int& note2index
+    const int& note2index,
+    const int& note1Octave,
+    const int& note2Octave
   ) {
     string str = songName;
     char* cstr = &str[0];
 
-    patch.display.SetCursor(2, 0);
+    patch.display.SetCursor(0, 0);
     patch.display.WriteString(cstr, Font_6x8, true);
 
-    patch.display.SetCursor(2, 10);
+    patch.display.SetCursor(0, 10);
     str = targetChord;
     patch.display.WriteString(cstr, Font_6x8, true);
 
-    patch.display.SetCursor(2, 20);
+    patch.display.SetCursor(0, 20);
     str = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(songLength);
     patch.display.WriteString(cstr, Font_6x8, true);
 
-    patch.display.SetCursor(2, 30);
+    patch.display.SetCursor(0, 30);
 
-    Display::drawKeyboard(targetScale, jazzAmountCh1, chordRootIndex, note1index, 2, 32);
-    Display::drawKeyboard(targetScale, jazzAmountCh2, chordRootIndex, note2index, 72, 32);
+    Display::drawKeyboard(targetScale, jazzAmountCh1, chordRootIndex, note1index, 0, 32);
+
+    for (int i = 0; i < 5; i++) {
+      patch.display.DrawCircle(
+        59,
+        40 + (i * 5),
+        i == (4 - note1Octave) ? 2 : 1, 
+        true
+      );
+      patch.display.DrawCircle(
+        68,
+        40 + (i * 5),
+        i == (4 - note2Octave) ? 2 : 1, 
+        true
+      );
+    }
+    Display::drawKeyboard(targetScale, jazzAmountCh2, chordRootIndex, note2index, 73, 32);
   }
 
   void renderFileBrowser(

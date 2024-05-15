@@ -5,10 +5,10 @@
 
 namespace Quantizer {
   std::pair<float, int> quantizeToScale(
-    const float& noteInVoltage, 
-    const float& chordRootOffsetVoltage, 
+    const float noteInVoltage, 
+    const int chordRootIndex, 
     const std::array<float, 12>& targetScale, 
-    const float& jazzAmount
+    const float jazzAmount
   );
 }
 

@@ -36,16 +36,18 @@ bool beatChanging = false;
 int chordType = 0;
 int chordRootIndex = 0;
 
-Theory::Chord *targetChord;
-array<float, 12> targetScale = Theory::chordList[0]->chordScale;
+Theory::Chord *targetChord = Theory::chordList[0];
+array<float, 12> targetScale = targetChord->chordScale;
 
 float jazzAmountCh1 = 0.5;
 float jazzAmountCh2 = 0.5;
 
 float note1QuantizedVoltage = 0.0;
 int note1index = 0;
+int note1Octave = 0;
 float note2QuantizedVoltage = 0.0;
 int note2index = 0;
+int note2Octave = 0;
 
 void UpdateControls();
 void Process();
@@ -258,14 +260,16 @@ void Process() {
   float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 5.f;
 
   // Quantize the inputs to active notes in the target scale
-  float chordRootOffsetVoltage = (float)chordRootIndex / 12.0;
-  std::pair<float, int> values1 = Quantizer::quantizeToScale(voice1Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh1);
-  std::pair<float, int> values2 = Quantizer::quantizeToScale(voice2Voltage, chordRootOffsetVoltage, targetScale, jazzAmountCh2);
+  std::pair<float, int> values1 = Quantizer::quantizeToScale(voice1Voltage, chordRootIndex, targetScale, jazzAmountCh1);
+  std::pair<float, int> values2 = Quantizer::quantizeToScale(voice2Voltage, chordRootIndex, targetScale, jazzAmountCh2);
 
   note1QuantizedVoltage = values1.first;
   note1index = values1.second;
   note2QuantizedVoltage = values2.first;
   note2index = values2.second;
+
+  note1Octave = floor(voice1Voltage);
+  note2Octave = floor(voice2Voltage);
 
   beatChanging = false;
 }
@@ -283,7 +287,9 @@ void UpdateOled() {
     chordRootIndex,
     targetScale,
     note1index,
-    note2index
+    note2index,
+    note1Octave,
+    note2Octave
   );
   } else if (displayTabIndex == 1) {
     Display::renderFileBrowser(
