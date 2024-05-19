@@ -30,13 +30,14 @@ namespace Display {
     int blackKeyOffset = 3;
     int keyGap = 2;
 
-    for (size_t i = 0; i < targetScale.size(); i++) {
+    for (int i = 0; i < 12; i++) {
       int rotatedIndex = (i + 12 - chordRootIndex) % 12;
 
       // TODO weirdly inverted?
       // TODO should be set outside (maybe as an array of avil notes)
+      // TODO de-magic-number 0.1
       shouldFillKey = false;
-      if (targetScale[rotatedIndex] >= (1 - jazzAmount)) {
+      if (targetScale[rotatedIndex] + 0.1 >= (1 - jazzAmount)) {
         shouldFillKey = true;
       }
       // White keys

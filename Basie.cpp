@@ -160,6 +160,7 @@ int main(void) {
 
   SDHandler::initSDCard();
   fileList = SDHandler::listTxtFiles("/");
+  std::sort(fileList.begin(), fileList.end());
   loadSong(fileList[0]);
 
   while(1) {
@@ -277,20 +278,20 @@ void Process() {
 void UpdateOled() {
   patch.display.Fill(false);
   if (displayTabIndex == 0) {
-    Display::renderSongView(
-    currentFileName,
-    chordDisplayName,
-    playhead,
-    currentSongChords.size(),
-    jazzAmountCh1,
-    jazzAmountCh2,
-    chordRootIndex,
-    targetScale,
-    note1index,
-    note2index,
-    note1Octave,
-    note2Octave
-  );
+      Display::renderSongView(
+      currentFileName,
+      chordDisplayName,
+      playhead,
+      currentSongChords.size(),
+      jazzAmountCh1,
+      jazzAmountCh2,
+      chordRootIndex,
+      targetScale,
+      note1index,
+      note2index,
+      note1Octave,
+      note2Octave
+    );
   } else if (displayTabIndex == 1) {
     Display::renderFileBrowser(
       fileList,

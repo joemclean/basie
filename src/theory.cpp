@@ -16,17 +16,17 @@ namespace Theory {
   };
 
   Theory::Chord::~Chord() {};
-
-  array<float, 12> ionianScale =           {1.0, 0.0, 0.1, 0.0, 0.5, 0.3, 0.0, 0.7, 0.0, 0.3, 0.0, 0.5};
-  array<float, 12> dorianScale =           {1.0, 0.0, 0.3, 0.5, 0.0, 0.3, 0.0, 0.7, 0.0, 0.1, 0.7, 0.0};
+  //                          Scale degree: 1    m2   2    m3   M3   4    b5   5    m6   M6   m7   M7
+  array<float, 12> ionianScale =           {1.0, 0.0, 0.1, 0.0, 0.6, 0.2, 0.0, 0.7, 0.0, 0.3, 0.0, 0.5};
+  array<float, 12> dorianScale =           {1.0, 0.0, 0.3, 0.6, 0.0, 0.2, 0.0, 0.7, 0.0, 0.1, 0.7, 0.0};
   array<float, 12> phrygianScale =         {1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0};
-  array<float, 12> lydianScale =           {1.0, 0.0, 0.1, 0.0, 0.5, 0.0, 0.7, 0.7, 0.0, 0.3, 0.0, 0.6};
+  array<float, 12> lydianScale =           {1.0, 0.0, 0.1, 0.0, 0.6, 0.0, 0.7, 0.7, 0.0, 0.3, 0.0, 0.6};
   array<float, 12> lydianDominantScale =   {1.0, 0.0, 0.1, 0.0, 0.5, 0.0, 0.7, 0.7, 0.0, 0.3, 0.6, 0.0};
-  array<float, 12> mixolydianScale =       {1.0, 0.0, 0.1, 0.0, 0.5, 0.3, 0.0, 0.7, 0.0, 0.3, 0.5, 0.0};
-  array<float, 12> mixolydianFlat2Scale =  {1.0, 0.7, 0.0, 0.0, 0.5, 0.2, 0.0, 0.7, 0.0, 0.2, 0.6, 0.0};
+  array<float, 12> mixolydianScale =       {1.0, 0.0, 0.1, 0.0, 0.6, 0.2, 0.0, 0.7, 0.0, 0.3, 0.5, 0.0};
+  array<float, 12> mixolydianFlat2Scale =  {1.0, 0.7, 0.0, 0.0, 0.5, 0.2, 0.0, 0.7, 0.0, 0.3, 0.6, 0.0};
   array<float, 12> mixolydianFlat13Scale = {1.0, 0.0, 0.1, 0.0, 0.5, 1.0, 0.0, 0.8, 0.7, 0.0, 0.6, 0.0};
-  array<float, 12> aeoleanScale =          {1.0, 0.0, 0.1, 0.5, 0.0, 0.3, 0.0, 0.7, 0.0, 0.3, 0.0, 0.5};
-  array<float, 12> locrianScale =          {1.0, 0.1, 0.0, 0.5, 0.0, 0.3, 0.7, 0.0, 0.3, 0.0, 0.5, 0.0};
+  array<float, 12> aeoleanScale =          {1.0, 0.0, 0.1, 0.6, 0.0, 0.2, 0.0, 0.7, 0.0, 0.3, 0.0, 0.5};
+  array<float, 12> locrianScale =          {1.0, 0.1, 0.0, 0.5, 0.0, 0.2, 0.7, 0.0, 0.3, 0.0, 0.5, 0.0};
   array<float, 12> diminishedScale =       {1.0, 0.0, 0.6, 0.8, 0.0, 0.6, 0.8, 0.0, 0.6, 0.8, 0.0, 0.6};
   array<float, 12> alteredScale =          {1.0, 0.3, 0.0, 0.5, 0.1, 0.0, 0.8, 0.0, 0.4, 0.0, 0.6, 0.0};
   array<float, 12> augmentedScale =        {1.0, 0.0, 0.2, 0.0, 0.5, 0.0, 0.0, 0.2, 0.8, 0.0, 0.0, 0.2};

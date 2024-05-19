@@ -25,7 +25,7 @@ namespace Quantizer {
 
     for (int i = 0; i < 12; i++) {
       int targetIndex = (i + (12 - chordRootIndex)) % 12;
-      quantizerStepIsActive = (float)targetScale[targetIndex] >= jazzThreshold;
+      quantizerStepIsActive = (float)targetScale[targetIndex] + 0.1 >= jazzThreshold;
       if (quantizerStepIsActive) {
         float indexAsFloat = (float)i;
         float indexAsVoltage = (indexAsFloat/12);
