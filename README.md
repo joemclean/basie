@@ -20,7 +20,6 @@ Basie is a module designed to run on the Daisy Patch. It provides a 2-channel qu
 | CV 4 | Jazz control 2 | PControls the number of candidate notes, in increasing order of dissonance |
 | CV 1 Out | Quantizer 1 out | Quantized 1v/oct note |
 | CV 2 Out | Quantizer 2 out | Quantized 1v/oct note |
-
 | Encoder (Press and turn) | Switch between tabs | Press and hold to switch between the song list and song view |
 | Encoder (turn) | Scroll file list | Move up and down the file list in the song list view |
 | Encoder (press) | Select song | Select the currently highlighted song in the song view |
