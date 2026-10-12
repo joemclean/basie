@@ -1,15 +1,15 @@
-#ifndef QUANTIZER_H
-#define QUANTIZER_H
-
-#include <array>
+#pragma once
+#include "theory.hpp"
+#include <cstdint>
 
 namespace Quantizer {
-  std::pair<float, int> quantizeToScale(
-    const float noteInVoltage, 
-    const int chordRootIndex, 
-    const std::array<float, 12>& targetScale, 
-    const float jazzAmount
-  );
-}
-
-#endif
+constexpr float maxVoltage = 5.f;
+struct Note {
+    float voltage = 0;
+    int pitchClass = 0;
+    int octave = 0;
+};
+// Nearest enabled note within 0..5 V. Exact ties select the lower note.
+Note quantize(float inputVoltage, Theory::NoteMask notes);
+std::uint16_t dacCode(float voltage);
+} // namespace Quantizer

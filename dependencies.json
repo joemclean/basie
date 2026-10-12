@@ -1,0 +1,20 @@
+{
+  "libDaisy": {
+    "url": "https://github.com/electro-smith/libDaisy.git",
+    "revision": "9498417add4a4c76bc10737d5e9f43750a4da639",
+    "release": "v8.1.0",
+    "submodules": [
+      "Drivers/CMSIS-DSP",
+      "Drivers/CMSIS-Device/ST/STM32H7xx",
+      "Drivers/CMSIS_5",
+      "Drivers/STM32H7xx_HAL_Driver",
+      "Middlewares/ST/STM32_USB_Device_Library"
+    ]
+  },
+  "DaisySP": {
+    "url": "https://github.com/electro-smith/DaisySP.git",
+    "revision": "a0494a3adb67f549e18dfd71a35fa656f65b38b6",
+    "release": "V1.0.0",
+    "submodules": []
+  }
+}

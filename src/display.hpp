@@ -1,40 +1,12 @@
-#ifndef DISPLAY_H
-#define DISPLAY_H
-
-#include <array>
+#pragma once
+#include "state.hpp"
+#include "daisy_patch.h"
 #include <string>
 #include <vector>
 
 namespace Display {
-
-  void drawKeyboard(
-    const std::array<float, 12>& targetScale, 
-    const float& jazzAmount, 
-    const int& chordRootIndex,
-    const int& x_origin,
-    const int& y_origin
-  );
-
-  void renderSongView(
-    const std::string& songName,
-    const std::string& targetChord,
-    const int& playhead,
-    const int& songLength,
-    const float& jazzAmountCh1, 
-    const float& jazzAmountCh2,
-    const int& chordRootIndex,
-    std::array<float, 12>& targetScale,
-    const int& note1index,
-    const int& note2index,
-    const int& note1Octave,
-    const int& note2Octave
-  );
-
-  void renderFileBrowser(
-    const std::vector<std::string>& fileList,
-    const int& loadedFileIndex,
-    const int& fileListCursor
-  );
-}
-
-#endif
+using Oled = daisy::OledDisplay<daisy::SSD130x4WireSpi128x64Driver>;
+void song(Oled& display, const std::string& filename, const PlaybackView& view);
+void files(Oled& display, const std::vector<std::string>& names, int loaded, int cursor);
+void error(Oled& display, const std::string& message, bool playing);
+} // namespace Display

@@ -1,308 +1,179 @@
-#include "daisysp.h"
 #include "daisy_patch.h"
-
-#include "src/theory.hpp"
-#include "src/quantizer.hpp"
-#include "src/sdhandler.hpp"
+#include "daisysp.h"
+#include "util/scopedirqblocker.h"
+#include "src/controls.hpp"
 #include "src/display.hpp"
-#include "src/MIDI.hpp"
+#include "src/midi_output.hpp"
+#include "src/playback.hpp"
+#include "src/sdhandler.hpp"
+#include "src/state.hpp"
+#include <array>
+#include <string>
+#include <utility>
+#include <vector>
 
-using namespace daisy;
-using namespace daisysp;
+namespace {
+struct Application {
+    daisy::DaisyPatch patch;
+    SDHandler::Card card;
+    MidiOutput midi;
+    Playback playback;
+    Controls::EncoderActions controls;
+    PlaybackView view;
+    std::array<daisysp::Oscillator, 3> oscillators;
+    std::uint32_t audioRevision = 0;
 
-DaisyPatch patch;
+    // Foreground-only storage. Playback reads one immutable song; the other
+    // can be replaced without disturbing the callback or freeing its data.
+    std::array<Songs::Song, 2> songs;
+    int activeSong = 0;
+    std::vector<std::string> files;
+    std::string filename = "No song";
+    std::string error;
+    int cursor = 0;
+    int loaded = -1;
+    bool browser = false;
+};
+Application app;
 
-// --- System variables --- //
-
-// Display variables
-vector<string> fileList = {};
-int loadedFileIndex = 0;
-
-int displayTabIndex = 0;
-bool encoderIsHeld = false;
-bool tabChangeInProcess = false;
-
-string chordDisplayName = "No chord";
-string currentFileName = "No file";
-
-int fileListCursor = 0;
-
-// Module state variables
-vector<string> currentSongChords = {};
-int playhead = 0;
-
-bool beatChanging = false;
-
-int chordType = 0;
-int chordRootIndex = 0;
-
-Theory::Chord *targetChord = Theory::chordList[0];
-array<float, 12> targetScale = targetChord->chordScale;
-
-float jazzAmountCh1 = 0.5;
-float jazzAmountCh2 = 0.5;
-
-float note1QuantizedVoltage = 0.0;
-int note1index = 0;
-int note1Octave = 0;
-float note2QuantizedVoltage = 0.0;
-int note2index = 0;
-int note2Octave = 0;
-
-void UpdateControls();
-void Process();
-void UpdateOled();
-void UpdateOutputs();
-
-void loadSong(const string& fileName) {
-  MIDI::clearMidi();
-  string fileChords = SDHandler::loadChordsFromFile(fileName);
-  currentSongChords = SDHandler::parseChords(fileChords);
-  currentFileName = fileName;
-  playhead = 0;
-}
-
-void ProcessEncoder() {
-  if (patch.encoder.RisingEdge()) {
-    encoderIsHeld = true;
-  }
-  if (patch.encoder.FallingEdge()) {
-    encoderIsHeld = false;
-    if (!tabChangeInProcess && displayTabIndex == 1) {
-      loadSong(fileList[fileListCursor]);
-      loadedFileIndex = fileListCursor;
+void audioCallback(daisy::AudioHandle::InputBuffer,
+                   daisy::AudioHandle::OutputBuffer output, std::size_t size) {
+    auto& patch = app.patch;
+    patch.ProcessAnalogControls();
+    patch.ProcessDigitalControls();
+    app.controls.process(patch.encoder.Increment(), patch.encoder.Pressed(), patch.encoder.FallingEdge());
+    // Always sample both inputs; reset wins if both have an edge in this block.
+    const bool clock = patch.gate_input[0].Trig();
+    const bool reset = patch.gate_input[1].Trig();
+    app.playback.process(clock, reset);
+    const auto* event = app.playback.current();
+    auto& view = app.view;
+    view.playing = event != nullptr;
+    view.playhead = app.playback.playhead();
+    view.songLength = app.playback.length();
+    view.revision = app.playback.revision();
+    if (event) {
+        view.chord = *event;
+        if (app.audioRevision != view.revision) {
+            view.voicing = MIDI::voiceChord(*event);
+            for (std::size_t i = 0; i < app.oscillators.size(); ++i)
+                app.oscillators[i].SetFreq(daisysp::mtof(view.voicing.notes[i]) - static_cast<float>(i) * .1f);
+            app.audioRevision = view.revision;
+        }
+        const auto& chord = Theory::chords[event->chord];
+        for (std::size_t channel = 0; channel < 2; ++channel) {
+            const auto pitchControl = channel == 0 ? daisy::DaisyPatch::CTRL_1 : daisy::DaisyPatch::CTRL_2;
+            const auto jazzControl = channel == 0 ? daisy::DaisyPatch::CTRL_3 : daisy::DaisyPatch::CTRL_4;
+            view.activeNotes[channel] = Theory::activeNotes(event->root, chord.scale, patch.GetKnobValue(jazzControl));
+            view.notes[channel] = Quantizer::quantize(patch.GetKnobValue(pitchControl) * 5.f, view.activeNotes[channel]);
+        }
     }
-    tabChangeInProcess = false;
-  }
-  int increment = patch.encoder.Increment();
-  if (increment != 0) {
-    if (encoderIsHeld) {
-      // Change tab
-      displayTabIndex++;
-      displayTabIndex = displayTabIndex % 2;
-      tabChangeInProcess = true;
-    } else {
-      // Navigate file system
-      int fileListSize = static_cast<int>(fileList.size());
-      fileListCursor += increment;
-
-      // Wrap around logic
-      if (fileListCursor >= fileListSize) {
-        fileListCursor = 0;
-      } else if (fileListCursor < 0) {
-        fileListCursor = fileListSize > 0 ? fileListSize - 1 : 0;
-      }
-    }
-  }
-}
-
-void UpdateControls() {
-  patch.ProcessAnalogControls();
-  patch.ProcessDigitalControls();
-  ProcessEncoder();
-}
-
-Oscillator osc[3];
-
-float testval;
-
-void SetupOsc(float samplerate)
-{
-    for(int i = 0; i < 3; i++)
-    {
-        osc[i].Init(samplerate);
-        osc[i].SetAmp(.7);
-    }
-}
-
-static void AudioCallback(AudioHandle::InputBuffer  in,
-                          AudioHandle::OutputBuffer out,
-                          size_t                    size)
-{
-    for(size_t i = 0; i < size; i++)
-    {
+    patch.seed.dac.WriteValue(daisy::DacHandle::Channel::ONE, Quantizer::dacCode(view.notes[0].voltage));
+    patch.seed.dac.WriteValue(daisy::DacHandle::Channel::TWO, Quantizer::dacCode(view.notes[1].voltage));
+    for (std::size_t sample = 0; sample < size; ++sample) {
         float mix = 0;
-        //Process and output the three oscillators
-        for(size_t chn = 0; chn < 3; chn++)
-        {
-            float sig = osc[chn].Process();
-            mix += sig * .25f;
-            out[chn][i] = sig;
+        for (std::size_t voice = 0; voice < app.oscillators.size(); ++voice) {
+            const float signal = event ? app.oscillators[voice].Process() : 0.f;
+            output[voice][sample] = signal;
+            mix += signal * .25f;
         }
-
-        // output the mixed oscillators
-        out[3][i] = mix;
+        output[3][sample] = mix;
     }
 }
 
-// --- Implementation --- //
+PlaybackView snapshot() {
+    // RAII restores the previous interrupt state automatically on return.
+    // Only copy a small value here: no allocation, file I/O, or display work.
+    const daisy::ScopedIrqBlocker lock;
+    return app.view;
+}
 
-int main(void) {
-    float samplerate;
-    patch.Init(); // Initialize hardware (daisy seed, and patch)
-    samplerate = patch.AudioSampleRate();
-
-    SetupOsc(samplerate);
-
-    testval = 0.f;
-
-    patch.StartAdc();
-    patch.StartAudio(AudioCallback);
-
-    for(int i = 0; i < 3; i++)
+void loadSong(int index) {
+    if (index < 0 || static_cast<std::size_t>(index) >= app.files.size()) return;
+    auto candidate = app.card.load(app.files[index]);
+    if (!candidate) { app.error = candidate.error; return; }
+    const int slot = 1 - app.activeSong;
+    app.songs[slot] = std::move(candidate.song);
+    bool installed;
     {
-        osc[i].SetFreq(440);
-        osc[i].SetWaveform(0);
+        const daisy::ScopedIrqBlocker lock;
+        installed = app.playback.install(app.songs[slot]);
     }
-
-  // start callback
-  patch.StartAudio(AudioCallback);
-
-  SDHandler::initSDCard();
-  fileList = SDHandler::listTxtFiles("/");
-  std::sort(fileList.begin(), fileList.end());
-  loadSong(fileList[0]);
-
-  while(1) {
-    UpdateControls();
-    UpdateOled();
-    Process();
-    UpdateOutputs();
-  }
+    if (!installed) { app.error = "Invalid song"; return; }
+    app.activeSong = slot;
+    app.filename = app.files[index];
+    app.loaded = index;
+    app.error.clear();
 }
 
-void Process() {                                                                                                                   
-  // Advance the playhead on clock trigger
-  if (patch.gate_input[0].Trig()) {
-    beatChanging = true;
-    int songLength = currentSongChords.size();
-    playhead = (playhead + 1) % songLength;
-  }
+void rescan() {
+    app.error = app.card.init();
+    if (!app.error.empty()) return;
+    auto listing = app.card.listSongs();
+    if (!listing.error.empty()) { app.error = listing.error; return; }
+    app.files = std::move(listing.files);
+    app.cursor = 0;
+    app.loaded = -1;
+    for (std::size_t i = 0; i < app.files.size(); ++i)
+        if (app.files[i] == app.filename) app.loaded = static_cast<int>(i);
+}
 
-  // Reset the playhead on reset trigger
-  if (patch.gate_input[1].Trig()) {
-    playhead = 0;
-  }
-
-    // TODO - only bother processing all of this if the playhead advances
-  string chordString = currentSongChords[playhead];
-
-  chordDisplayName = chordString;
-
-  // Parse the chord string
-
-  string chordRoot = "C";
-  string chordType = "maj7";
-
-  char chordBuffer[10];
-  strcpy(chordBuffer, chordString.c_str());
-
-  char chordRootBuffer[10];
-  char chordTypeBuffer[10];
-
-  strcpy(chordRootBuffer, strtok(chordBuffer, " "));
-  strcpy(chordTypeBuffer, strtok(NULL, " "));
-
-  chordRoot = chordRootBuffer;
-  chordType = chordTypeBuffer;
-
-  // Match the root
-  for (int i = 0; i < 12; i++) {
-    if (chordRoot == Theory::noteNamesFlats[i] || chordRoot == Theory::noteNamesSharps[i]) {
-      chordRootIndex = i;
-    }
-  }
-
-  // Match the chord type
-  std::array<Theory::Chord*, Theory::chordList.size()> availableChordList = Theory::chordList;
-  targetChord = availableChordList[0]; // initialize with default
-  for (size_t i = 0; i < availableChordList.size(); i++) {
-    if (availableChordList[i]->displayName == chordType) {
-      targetChord = availableChordList[i];
-    }
-  }
-
-  // Iterate over active chord tones and output as MIDI notes
-  int chordToneCount = targetChord->tones.size();
-  if (beatChanging) {
-    MIDI::clearMidi();
-    for (int i = 0; i < chordToneCount; i++) {   
-      int chordTone = targetChord->tones[i];  
-      // Migration TODO: Reimplement voicing type
-      int targetMidiNote = 36 + chordRootIndex + chordTone;
-      MIDI::MIDISendNoteOn(0, targetMidiNote, 100, i);
-      if (i < 4) {
-        if (i > 0) {
-          targetMidiNote = targetMidiNote + 12;
+void processUi() {
+    Controls::Action action;
+    for (int handled = 0; handled < 32; ++handled) {
+        bool available;
+        bool overflow;
+        {
+            const daisy::ScopedIrqBlocker lock;
+            available = app.controls.pop(action);
+            overflow = app.controls.takeOverflow();
         }
-        MIDI::MIDISendNoteOn(0, targetMidiNote, 100, i);
-      }
-      if (i < 3){
-        float detune = i * 0.1f;
-        osc[i].SetFreq(mtof(targetMidiNote) - detune);
-      }
+        if (overflow) app.error = "Controls busy; try again";
+        if (!available) break;
+        if (!app.error.empty()) {
+            if (action.kind == Controls::Kind::Select) app.error.clear();
+            continue;
+        }
+        if (action.kind == Controls::Kind::ToggleTab) app.browser = !app.browser;
+        else if (action.kind == Controls::Kind::Scroll && app.browser && !app.files.empty()) {
+            const int count = static_cast<int>(app.files.size());
+            app.cursor = ((app.cursor + action.increment) % count + count) % count;
+        } else if (action.kind == Controls::Kind::Select && app.browser) {
+            if (app.files.empty()) rescan();
+            else loadSong(app.cursor);
+        }
     }
-  }
-  
-  // Quantize input to output
-  targetScale = targetChord->chordScale;
-
-  jazzAmountCh1 = patch.GetKnobValue((DaisyPatch::Ctrl)2) * 1.f;
-  jazzAmountCh2 = patch.GetKnobValue((DaisyPatch::Ctrl)3) * 1.f;
-
-  if (jazzAmountCh1 > 1) jazzAmountCh1 = 1;
-  if (jazzAmountCh1 < 0) jazzAmountCh1 = 0;
-
-  if (jazzAmountCh2 > 1) jazzAmountCh2 = 1;
-  if (jazzAmountCh2 < 0) jazzAmountCh2 = 0;
-
-  // Read quantizer ins
-  float voice1Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)0) * 5.f;
-  float voice2Voltage = patch.GetKnobValue((DaisyPatch::Ctrl)1) * 5.f;
-
-  // Quantize the inputs to active notes in the target scale
-  std::pair<float, int> values1 = Quantizer::quantizeToScale(voice1Voltage, chordRootIndex, targetScale, jazzAmountCh1);
-  std::pair<float, int> values2 = Quantizer::quantizeToScale(voice2Voltage, chordRootIndex, targetScale, jazzAmountCh2);
-
-  note1QuantizedVoltage = values1.first;
-  note1index = values1.second;
-  note2QuantizedVoltage = values2.first;
-  note2index = values2.second;
-
-  note1Octave = floor(voice1Voltage);
-  note2Octave = floor(voice2Voltage);
-
-  beatChanging = false;
 }
+} // namespace
 
-void UpdateOled() {
-  patch.display.Fill(false);
-  if (displayTabIndex == 0) {
-      Display::renderSongView(
-      currentFileName,
-      chordDisplayName,
-      playhead,
-      currentSongChords.size(),
-      jazzAmountCh1,
-      jazzAmountCh2,
-      chordRootIndex,
-      targetScale,
-      note1index,
-      note2index,
-      note1Octave,
-      note2Octave
-    );
-  } else if (displayTabIndex == 1) {
-    Display::renderFileBrowser(
-      fileList,
-      loadedFileIndex,
-      fileListCursor
-    );
-  }
-  patch.display.Update();
-}
-
-void UpdateOutputs() {
-  patch.seed.dac.WriteValue(DacHandle::Channel::ONE, note1QuantizedVoltage * 819.2f);
-  patch.seed.dac.WriteValue(DacHandle::Channel::TWO, note2QuantizedVoltage * 819.2f);
+int main() {
+    app.patch.Init();
+    app.patch.SetAudioBlockSize(24); // 48 kHz / 24 = 2 kHz control and gate sampling.
+    for (auto& oscillator : app.oscillators) {
+        oscillator.Init(app.patch.AudioSampleRate());
+        oscillator.SetAmp(.7f);
+        oscillator.SetWaveform(daisysp::Oscillator::WAVE_SIN);
+    }
+    const bool midiReady = app.midi.init();
+    rescan();
+    if (app.error.empty() && !app.files.empty()) loadSong(0);
+    if (!midiReady && app.error.empty()) app.error = "MIDI initialization failed";
+    app.patch.StartAdc();
+    app.patch.StartAudio(audioCallback);
+    std::uint32_t lastDisplay = daisy::System::GetNow() - 33;
+    while (true) {
+        processUi();
+        const auto view = snapshot();
+        app.midi.service(view.voicing, view.revision);
+        const auto now = daisy::System::GetNow();
+        if (now - lastDisplay >= 33) {
+            lastDisplay = now;
+            if (!app.error.empty()) Display::error(app.patch.display, app.error, view.playing);
+            else if (app.midi.failed()) Display::error(app.patch.display, "MIDI send failed; retrying", view.playing);
+            else if (app.browser) Display::files(app.patch.display, app.files, app.loaded, app.cursor);
+            else Display::song(app.patch.display, app.filename, view);
+            app.patch.display.Update();
+        }
+        app.patch.DelayMs(1);
+    }
 }

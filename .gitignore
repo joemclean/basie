@@ -1,1 +1,5 @@
-/build/*
+/build/
+/build-host/
+/vendor/
+.DS_Store
+__pycache__/

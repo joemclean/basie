@@ -1,40 +1,28 @@
-#include "daisysp.h"
-#include "daisy_patch.h"
-
-using namespace daisy;
-using namespace daisysp;
-
-extern DaisyPatch patch;
+#include "MIDI.hpp"
+#include "theory.hpp"
+#include <algorithm>
 
 namespace MIDI {
-  int activeNotes [4];
-
-  // --- Functions --- //
-
-  void MIDISendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity, int index) {
-    activeNotes[index] = note;
-    uint8_t data[3] = { 0 };
-    
-    data[0] = (channel & 0x0F) + 0x90;  // limit channel byte, add status byte
-    data[1] = note & 0x7F;              // remove MSB on data
-    data[2] = velocity & 0x7F;
-
-    patch.midi.SendMessage(data, 3);
-  };
-
-  void MIDISendNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
-    uint8_t data[3] = { 0 };
-
-    data[0] = (channel & 0x0F) + 0x80;  // limit channel byte, add status byte
-    data[1] = note & 0x7F;              // remove MSB on data
-    data[2] = velocity & 0x7F;
-
-    patch.midi.SendMessage(data, 3);
-  }
-
-  void clearMidi() {
-    for (int i = 0; i < 4; i++){
-      MIDISendNoteOff(0, activeNotes[i], 100);
-    }
-  }
+Voicing voiceChord(const Songs::Event& event) {
+    if (event.root >= 12 || event.chord >= Theory::chordCount) return {};
+    Voicing result;
+    result.count = voiceCount;
+    const auto& chord = Theory::chords[event.chord];
+    for (std::size_t i = 0; i < voiceCount; ++i)
+        result.notes[i] = static_cast<std::uint8_t>(36 + event.root + chord.tones[i] + (i == 0 ? 0 : 12));
+    return result;
 }
+Packet VoiceTracker::transition(const Voicing& next) const {
+    Packet packet;
+    const auto append = [&packet](std::uint8_t status, std::uint8_t note, std::uint8_t velocity) {
+        packet.bytes[packet.size++] = status;
+        packet.bytes[packet.size++] = note & 0x7f;
+        packet.bytes[packet.size++] = velocity;
+    };
+    for (std::size_t i = 0; i < std::min(active_.count, voiceCount); ++i)
+        append(static_cast<std::uint8_t>(0x80 | (active_.channel & 0x0f)), active_.notes[i], 0);
+    for (std::size_t i = 0; i < std::min(next.count, voiceCount); ++i)
+        append(static_cast<std::uint8_t>(0x90 | (next.channel & 0x0f)), next.notes[i], 100);
+    return packet;
+}
+} // namespace MIDI

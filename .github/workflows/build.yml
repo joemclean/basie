@@ -1,0 +1,28 @@
+name: Build and test
+on: [push, pull_request]
+jobs:
+  host-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test core, adapters, and application with sanitizers
+        run: HOST_CXX=clang++ make test-sanitize
+  firmware:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Arm GNU Toolchain
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 \
+            https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi.tar.xz \
+            --output "$RUNNER_TEMP/arm-toolchain.tar.xz"
+          echo "95c011cee430e64dd6087c75c800f04b9c49832cc1000127a92a97f9c8d83af4  $RUNNER_TEMP/arm-toolchain.tar.xz" | sha256sum --check
+          tar -xf "$RUNNER_TEMP/arm-toolchain.tar.xz" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin" >> "$GITHUB_PATH"
+      - name: Fetch pinned SDKs
+        run: make deps
+      - name: Build SDKs and firmware
+        run: |
+          make -j2 libs
+          make -j2

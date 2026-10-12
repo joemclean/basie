@@ -1,165 +1,73 @@
 #include "display.hpp"
 #include "theory.hpp"
-
-#include "daisysp.h"
-#include "daisy_patch.h"
-
-using namespace daisy;
-using namespace daisysp;
-
-extern DaisyPatch patch;
+#include <algorithm>
 
 namespace Display {
-
-  int fileListPageIndex = 0;
-
-  void drawKeyboard(
-    const array<float, 12>& targetScale,
-    const float& jazzAmount, 
-    const int& chordRootIndex,
-    const int& targetNoteIndex,
-    const int& x_origin,
-    const int& y_origin
-  ) {
-    bool shouldFillKey = false;
-    int whiteKeyIndex = 0;
-    int blackKeyIndex = 0;
-
-    int keyHeight = 14;
-    int keyWidth = 6;
-    int blackKeyOffset = 3;
-    int keyGap = 2;
-
-    for (int i = 0; i < 12; i++) {
-      int rotatedIndex = (i + 12 - chordRootIndex) % 12;
-
-      // TODO weirdly inverted?
-      // TODO should be set outside (maybe as an array of avil notes)
-      // TODO de-magic-number 0.1
-      shouldFillKey = false;
-      if (targetScale[rotatedIndex] + 0.1 >= (1 - jazzAmount)) {
-        shouldFillKey = true;
-      }
-      // White keys
-      if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
-        patch.display.DrawRect(
-          x_origin + ((whiteKeyIndex * keyWidth) + (keyGap * whiteKeyIndex)), 
-          y_origin + keyHeight + keyGap, 
-          x_origin + ((whiteKeyIndex + 1) * keyWidth) + (keyGap * whiteKeyIndex), 
-          y_origin + (2 * keyHeight) + keyGap, 
-          true, 
-          shouldFillKey
-        );
-        if (i == targetNoteIndex) {
-          patch.display.DrawCircle(
-            x_origin + (whiteKeyIndex * keyWidth) + (keyGap * whiteKeyIndex) + (keyWidth / 2), 
-            y_origin + keyHeight + keyGap + (keyHeight / keyGap), 
-            2, 
-            false
-          );
-        }
-        whiteKeyIndex++;
-        // Black keys
-      } else {
-        patch.display.DrawRect(
-          x_origin + ((blackKeyIndex * keyWidth) + blackKeyOffset + (keyGap * blackKeyIndex)), 
-          y_origin,
-          x_origin + ((blackKeyIndex + 1) * keyWidth) + blackKeyOffset + (keyGap * blackKeyIndex), 
-          y_origin + keyHeight, 
-          true, 
-          shouldFillKey
-        );
-        if (i == targetNoteIndex) {
-          patch.display.DrawCircle(
-            x_origin + (blackKeyIndex * keyWidth) + blackKeyOffset + (keyGap * blackKeyIndex) + (keyWidth / 2), 
-            y_origin + keyHeight / 2, 
-            2, 
-            false
-          );
-        }
-        blackKeyIndex++;
-      }
-      if (i == 4) {
-        blackKeyIndex++;
-      }
-    }
-  }
-
-  void renderSongView(
-    const string& songName,
-    const string& targetChord,
-    const int& playhead,
-    const int& songLength,
-    const float& jazzAmountCh1, 
-    const float& jazzAmountCh2,
-    const int& chordRootIndex,
-    array<float, 12>& targetScale,
-    const int& note1index,
-    const int& note2index,
-    const int& note1Octave,
-    const int& note2Octave
-  ) {
-    string str = songName;
-    char* cstr = &str[0];
-
-    patch.display.SetCursor(0, 0);
-    patch.display.WriteString(cstr, Font_6x8, true);
-
-    patch.display.SetCursor(0, 10);
-    str = targetChord;
-    patch.display.WriteString(cstr, Font_6x8, true);
-
-    patch.display.SetCursor(0, 20);
-    str = "Chord " + std::to_string(playhead + 1) + "/" + std::to_string(songLength);
-    patch.display.WriteString(cstr, Font_6x8, true);
-
-    patch.display.SetCursor(0, 30);
-
-    Display::drawKeyboard(targetScale, jazzAmountCh1, chordRootIndex, note1index, 0, 32);
-
-    for (int i = 0; i < 5; i++) {
-      patch.display.DrawCircle(
-        59,
-        40 + (i * 5),
-        i == (4 - note1Octave) ? 2 : 1, 
-        true
-      );
-      patch.display.DrawCircle(
-        68,
-        40 + (i * 5),
-        i == (4 - note2Octave) ? 2 : 1, 
-        true
-      );
-    }
-    Display::drawKeyboard(targetScale, jazzAmountCh2, chordRootIndex, note2index, 73, 32);
-  }
-
-  void renderFileBrowser(
-    const std::vector<std::string>& fileList,
-    const int& loadedFileIndex,
-    const int& fileListCursor
-  ) {
-    string headerStr = "File browser";
-    patch.display.SetCursor(0, 0);
-    patch.display.WriteString(headerStr.c_str(), Font_6x8, true);
-
-    int filesPerPage = 5;
-    fileListPageIndex = (int)fileListCursor / filesPerPage ;
-    int lowerPageBound = fileListPageIndex * filesPerPage ;
-    int fileListLength = static_cast<int>(fileList.size());
-
-    int upperPageBound = (fileListPageIndex + 1) * filesPerPage;
-    if (upperPageBound > fileListLength) {
-      upperPageBound = fileListLength;
-    }
-
-    for (int i = lowerPageBound; i < upperPageBound; i++ ) {
-      patch.display.SetCursor(0, (i + 1 - (filesPerPage * fileListPageIndex)) * 10);
-      string fileStr;
-      fileListCursor == i ? fileStr += ">" : fileStr += " ";
-      loadedFileIndex == i ? fileStr += "*" : fileStr += " ";
-      fileStr += fileList[i];
-      patch.display.WriteString(fileStr.c_str(), Font_6x8, true);
-    }
-  }
+namespace {
+void text(Oled& display, int x, int y, const char* value) {
+    display.SetCursor(x, y);
+    display.WriteString(value, Font_6x8, true);
 }
+void keyboard(Oled& display, Theory::NoteMask notes, int selected, int x) {
+    int white = 0, black = 0;
+    constexpr int width = 6, height = 14, gap = 2, y = 32;
+    for (int pitch = 0; pitch < 12; ++pitch) {
+        const bool isWhite = pitch == 0 || pitch == 2 || pitch == 4 || pitch == 5
+                             || pitch == 7 || pitch == 9 || pitch == 11;
+        const int left = x + (isWhite ? white : black) * (width + gap) + (isWhite ? 0 : 3);
+        const int top = y + (isWhite ? height + gap : 0);
+        const bool active = Theory::contains(notes, pitch);
+        display.DrawRect(left, top, left + width, top + height, true, active);
+        if (selected == pitch) display.DrawCircle(left + width / 2, top + height / 2, 2, !active);
+        if (isWhite) ++white; else ++black;
+        if (pitch == 4) ++black;
+    }
+}
+}
+void song(Oled& display, const std::string& filename, const PlaybackView& view) {
+    display.Fill(false);
+    text(display, 0, 0, filename.c_str());
+    if (!view.playing) {
+        text(display, 0, 16, "No song loaded");
+        text(display, 0, 32, "Hold + turn: files");
+        return;
+    }
+    const std::string chord = std::string(Theory::noteNames[view.chord.root]) + " "
+                              + Theory::chords[view.chord.chord].name;
+    text(display, 0, 10, chord.c_str());
+    const std::string counter = "Chord " + std::to_string(view.playhead + 1) + "/"
+                                + std::to_string(view.songLength);
+    text(display, 0, 20, counter.c_str());
+    keyboard(display, view.activeNotes[0], view.notes[0].pitchClass, 0);
+    keyboard(display, view.activeNotes[1], view.notes[1].pitchClass, 73);
+    for (int octave = 0; octave <= 5; ++octave) {
+        display.DrawCircle(59, 35 + (5 - octave) * 5, view.notes[0].octave == octave ? 2 : 1, true);
+        display.DrawCircle(68, 35 + (5 - octave) * 5, view.notes[1].octave == octave ? 2 : 1, true);
+    }
+}
+void files(Oled& display, const std::vector<std::string>& names, int loaded, int cursor) {
+    display.Fill(false);
+    text(display, 0, 0, "File browser");
+    if (names.empty()) {
+        text(display, 0, 16, "No .txt songs");
+        text(display, 0, 32, "Click to rescan SD");
+        return;
+    }
+    cursor = std::clamp(cursor, 0, static_cast<int>(names.size()) - 1);
+    const int first = (cursor / 5) * 5;
+    const int last = std::min(first + 5, static_cast<int>(names.size()));
+    for (int i = first; i < last; ++i) {
+        const std::string line = std::string(i == cursor ? ">" : " ") + (i == loaded ? "*" : " ") + names[i];
+        text(display, 0, (i - first + 1) * 10, line.c_str());
+    }
+}
+void error(Oled& display, const std::string& message, bool playing) {
+    display.Fill(false);
+    text(display, 0, 0, "Unable to continue");
+    // Wrap the complete bounded loader error across the screen.
+    for (std::size_t start = 0; start < message.size() && start < 63; start += 21)
+        text(display, 0, 12 + static_cast<int>(start / 21) * 10, message.substr(start, 21).c_str());
+    text(display, 0, 44, playing ? "Song still playing" : "Outputs silent");
+    text(display, 0, 56, "Click to dismiss");
+}
+} // namespace Display

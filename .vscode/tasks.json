@@ -1,106 +1,131 @@
 {
+  "version": "2.0.0",
   "tasks": [
     {
-      "command": "make clean; make",
-      "group": {
-        "isDefault": true,
-        "kind": "build"
-      },
       "label": "build",
+      "command": "make",
+      "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [
         "$gcc"
       ],
-      "type": "shell"
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     },
     {
-      "command": "make clean; make; make program",
-      "label": "build_and_program",
+      "label": "fetch_dependencies",
+      "command": "make deps",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "build_libraries",
+      "command": "make libs",
+      "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [
         "$gcc"
       ],
-      "type": "shell"
-    },
-    {
-      "command": "make clean; make; make program-dfu",
-      "label": "build_and_program_dfu",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [
-        "$gcc"
-      ],
-      "type": "shell"
-    },
-    {
-      "command": "make clean;make",
       "dependsOn": [
-        "build_libdaisy",
-        "build_daisysp"
+        "fetch_dependencies"
       ],
+      "dependsOrder": "sequence"
+    },
+    {
       "label": "build_all",
+      "command": "make",
+      "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [
         "$gcc"
       ],
-      "type": "shell"
-    },
-    {
-      "command": "make clean;DEBUG=1 make",
       "dependsOn": [
-        "build_libdaisy",
-        "build_daisysp"
+        "build_libraries"
       ],
+      "dependsOrder": "sequence"
+    },
+    {
       "label": "build_all_debug",
+      "command": "make clean && make DEBUG=1",
+      "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [
         "$gcc"
       ],
-      "type": "shell"
+      "dependsOn": [
+        "build_libraries"
+      ],
+      "dependsOrder": "sequence"
     },
     {
-      "command": "make program-dfu",
-      "label": "program-dfu",
-      "problemMatcher": [],
-      "type": "shell"
+      "label": "build_and_program",
+      "command": "make && make program",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
     },
     {
-      "command": "make program",
+      "label": "build_and_program_dfu",
+      "command": "make && make program-dfu",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
       "label": "program",
-      "problemMatcher": [],
-      "type": "shell"
-    },
-    {
-      "command": "make",
-      "label": "build_libdaisy",
+      "command": "make program",
+      "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/../../libDaisy"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [
         "$gcc"
-      ],
-      "type": "shell"
+      ]
     },
     {
-      "command": "make",
-      "label": "build_daisysp",
+      "label": "program-dfu",
+      "command": "make program-dfu",
+      "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/../../DaisySP"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [
         "$gcc"
-      ],
-      "type": "shell"
+      ]
+    },
+    {
+      "label": "test",
+      "command": "make test-sanitize",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
     }
-  ],
-  "version": "2.0.0"
+  ]
 }
